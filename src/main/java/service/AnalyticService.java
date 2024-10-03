@@ -25,7 +25,7 @@ public class AnalyticService {
     }
 
     public void trackCapLockToggle() {
-        sendEventDetails("keypress","ctrl","toggle");
+        sendEventDetails("keypress","caps-lock","toggle");
     }
 
     public void trackCapLockFlipToggle() {
@@ -38,9 +38,9 @@ public class AnalyticService {
 
     private void sendEventDetails(String category, String action, String label) {
         javax.swing.SwingUtilities.invokeLater(() -> {
-            defaultProperties.setProperty("ec", URLEncoder.encode(category, StandardCharsets.UTF_8));
-            defaultProperties.setProperty("ea", URLEncoder.encode(action, StandardCharsets.UTF_8));
-            defaultProperties.setProperty("el", URLEncoder.encode(label, StandardCharsets.UTF_8));
+            defaultProperties.setProperty("ec", category);
+            defaultProperties.setProperty("ea", action);
+            defaultProperties.setProperty("el", label);
             sendRequest();
         });
     }

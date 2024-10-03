@@ -289,12 +289,12 @@ public class CapsLockHook extends JFrame implements NativeKeyListener {
     public void updatePosition(Position position) {
         logger.log(Level.INFO, "POSITION:" + position);
         switch (position) {
-            case TOP_LEFT -> setLocation(topLeft);
-            case TOP_RIGHT -> setLocation(topRight);
-            case TOP_CENTER -> setLocation(topCenter);
-            case BOTTOM_LEFT -> setLocation(bottomLeft);
-            case BOTTOM_RIGHT -> setLocation(bottomRight);
-            case BOTTOM_CENTER -> setLocation(bottomCenter);
+            case TOP_LEFT: setLocation(topLeft); break;
+            case TOP_RIGHT: setLocation(topRight); break;
+            case TOP_CENTER: setLocation(topCenter); break;
+            case BOTTOM_LEFT: setLocation(bottomLeft); break;
+            case BOTTOM_RIGHT: setLocation(bottomRight); break;
+            case BOTTOM_CENTER: setLocation(bottomCenter); break;
         }
         updateSettings(position, properties.getProperty(PROPERTY_POPUP_DELAY));
         showCapsLockStatusPopup();
