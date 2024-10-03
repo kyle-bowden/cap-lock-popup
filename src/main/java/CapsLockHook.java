@@ -1,3 +1,4 @@
+import config.AppConfig;
 import enums.Position;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
@@ -5,6 +6,7 @@ import org.jnativehook.NativeInputEvent;
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
 import service.AnalyticService;
+import util.Helpers;
 
 import javax.swing.*;
 import javax.swing.plaf.metal.DefaultMetalTheme;
@@ -17,13 +19,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Path2D;
 import java.awt.geom.RoundRectangle2D;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.Objects;
-import java.util.Properties;
-import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -46,8 +42,7 @@ public class CapsLockHook extends JFrame implements NativeKeyListener {
     private final Point bottomRight;
     private final Point bottomCenter;
 
-    private File propertiesFile;
-    public Properties properties;
+    private final AppConfig appConfig;
 
     private final GradientPaint defaultBackgroundGradient;
     private final AnalyticService analyticService;
@@ -67,9 +62,9 @@ public class CapsLockHook extends JFrame implements NativeKeyListener {
 
         setShape(new RoundRectangle2D.Double(0, 0, getWidth(), getHeight(), 30, 30));
 
-        boolean init = loadSettings();
         robot = new Robot();
-        analyticService = new AnalyticService(properties.getProperty(PROPERTY_CLIENT_ID));
+        appConfig = new AppConfig();
+        analyticService = new AnalyticService(appConfig.getProperty(PROPERTY_CLIENT_ID));
         defaultBackgroundGradient = new GradientPaint(100, 0, Color.BLACK, getWidth()+50, getHeight(), Color.GRAY);
 
         GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
@@ -97,54 +92,12 @@ public class CapsLockHook extends JFrame implements NativeKeyListener {
         setupSystemTray();
         Runtime.getRuntime().addShutdownHook(new Thread(this::stopCapsLockHook));
 
-        settingsView = new SettingsView(this);
-        if(init)  {
+        settingsView = new SettingsView(this, appConfig);
+        if(appConfig.isFirstTimeUser())  {
             settingsView.showSettings();
         }
 
-        updatePosition(Position.valueOf(properties.getProperty(PROPERTY_LOCATION)));
-    }
-
-    private boolean loadSettings() {
-        String appDataFolder = System.getenv("APPDATA") + "\\cap-lock-hook";
-        File settingsDIr = new File(appDataFolder);
-        if(!settingsDIr.exists()) {
-            boolean success = settingsDIr.mkdir();
-            if(!success) logger.log(Level.SEVERE, "Failed to create properties directory!");
-        }
-
-        properties = new Properties();
-        propertiesFile = new File(appDataFolder, "caplockhook.properties");
-        if(!propertiesFile.exists()) {
-            properties.setProperty(PROPERTY_CLIENT_ID, UUID.randomUUID().toString());
-            updateSettings(Position.BOTTOM_RIGHT, Util.formatWithOneDecimalPlace(2f));
-            return true;
-        } else {
-            try (FileInputStream input = new FileInputStream(propertiesFile)) {
-                properties.load(input);
-                migrateNewProperties();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        return false;
-    }
-
-    private void migrateNewProperties() {
-        if(properties.getProperty(PROPERTY_CLIENT_ID) == null) {
-            properties.setProperty(PROPERTY_CLIENT_ID, UUID.randomUUID().toString());
-        }
-    }
-
-    private void updateSettings(Position location, String popupDelay) {
-        properties.setProperty(PROPERTY_LOCATION, location.name());
-        properties.setProperty(PROPERTY_POPUP_DELAY, popupDelay);
-
-        try (FileOutputStream outputStream = new FileOutputStream(propertiesFile)) {
-            properties.store(outputStream, "Cap Lock Hook Properties");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        updatePopupPosition(Position.valueOf(appConfig.getProperty(PROPERTY_LOCATION)));
     }
 
     private void setupSystemTray() {
@@ -180,7 +133,7 @@ public class CapsLockHook extends JFrame implements NativeKeyListener {
             try {
                 tray.add(trayIcon);
             } catch (AWTException e) {
-                logger.log(Level.SEVERE, "TrayIcon could not be added.");
+                logger.log(Level.SEVERE, "TrayIcon could not be added.", e);
                 return;
             }
 
@@ -190,7 +143,7 @@ public class CapsLockHook extends JFrame implements NativeKeyListener {
                         try {
                             setVisible(false);
                         } catch (Exception e) {
-                            e.printStackTrace();
+                            logger.log(Level.SEVERE, "Tray could not be minimized.", e);
                         }
                     }
                 }
@@ -286,7 +239,7 @@ public class CapsLockHook extends JFrame implements NativeKeyListener {
         }
     }
 
-    public void updatePosition(Position position) {
+    public void updatePopupPosition(Position position) {
         logger.log(Level.INFO, "POSITION:" + position);
         switch (position) {
             case TOP_LEFT: setLocation(topLeft); break;
@@ -296,12 +249,12 @@ public class CapsLockHook extends JFrame implements NativeKeyListener {
             case BOTTOM_RIGHT: setLocation(bottomRight); break;
             case BOTTOM_CENTER: setLocation(bottomCenter); break;
         }
-        updateSettings(position, properties.getProperty(PROPERTY_POPUP_DELAY));
+        appConfig.updateConfig(position, appConfig.getProperty(PROPERTY_POPUP_DELAY));
         showCapsLockStatusPopup();
     }
 
     public void updatePopupDelay(boolean isUp) {
-        float popupDelay = Float.parseFloat(properties.getProperty(PROPERTY_POPUP_DELAY));
+        float popupDelay = Float.parseFloat(appConfig.getProperty(PROPERTY_POPUP_DELAY));
         if(isUp) {
             if(popupDelay < 5f) {
                 popupDelay += .5f;
@@ -315,10 +268,13 @@ public class CapsLockHook extends JFrame implements NativeKeyListener {
                 popupDelay = 1f;
             }
         }
-        updateSettings(Position.valueOf(properties.getProperty(PROPERTY_LOCATION)), Util.formatWithOneDecimalPlace(popupDelay));
+        appConfig.updateConfig(
+                Position.valueOf(appConfig.getProperty(PROPERTY_LOCATION)),
+                Helpers.formatWithOneDecimalPlace(popupDelay));
         setVisible(false);
         showCapsLockStatusPopup();
     }
+
     public void showCapsLockStatusPopup() {
         isSuccessPopup = false;
         if (isVisible()) {
@@ -361,10 +317,10 @@ public class CapsLockHook extends JFrame implements NativeKeyListener {
             throw new RuntimeException(ex);
         }
 
-        String content = Util.getClipboardContentAsString();
+        String content = Helpers.getClipboardContentAsString();
         logger.log(Level.INFO,"Convert content:" + content);
-        if(!content.equals("")) {
-            StringSelection selection = new StringSelection(Util.convertToLowerCaseWithCorrectPunctuation(content));
+        if(!content.isEmpty()) {
+            StringSelection selection = new StringSelection(Helpers.convertToLowerCaseWithCorrectPunctuation(content));
             clipboard.setContents(selection, null);
 
             // Simulate Delete to delete selected text
@@ -383,7 +339,7 @@ public class CapsLockHook extends JFrame implements NativeKeyListener {
     }
 
     private void hidePopup() {
-        float popupDelay = Float.parseFloat(properties.getProperty(PROPERTY_POPUP_DELAY));
+        float popupDelay = Float.parseFloat(appConfig.getProperty(PROPERTY_POPUP_DELAY));
         if(timer != null) timer.stop();
         timer = new Timer((int)popupDelay * 1000, e -> {
             setVisible(false);

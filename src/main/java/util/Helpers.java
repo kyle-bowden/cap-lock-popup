@@ -1,3 +1,5 @@
+package util;
+
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
@@ -6,7 +8,7 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.util.Locale;
 
-public class Util {
+public class Helpers {
     public static String formatWithOneDecimalPlace(float f) {
         return String.format(Locale.US, "%.1f", f);
     }

@@ -1,4 +1,6 @@
+import config.AppConfig;
 import enums.Position;
+import util.Helpers;
 
 import javax.swing.*;
 import java.awt.*;
@@ -13,6 +15,8 @@ public class SettingsView extends JFrame {
     private final int WINDOW_HEIGHT = 250;
     private final SelectableRoundRect[] selectableRects = new SelectableRoundRect[6];
 
+    private AppConfig appConfig;
+
     public final Font defaultFont = new Font("Arial Black", Font.PLAIN, 25);
     public final Font propertyFont = new Font("Arial Black", Font.PLAIN, 50);
     private final CapsLockHook capsLockHook;
@@ -25,8 +29,9 @@ public class SettingsView extends JFrame {
 
     private final GradientPaint defaultBackgroundGradient = new GradientPaint(100, 0, Color.BLACK, WINDOW_WIDTH, WINDOW_HEIGHT, Color.GRAY);
 
-    public SettingsView(CapsLockHook clh) {
+    public SettingsView(CapsLockHook clh, AppConfig config) {
         this.capsLockHook = clh;
+        this.appConfig = config;
 
         setTitle("Settings");
         setType(Type.UTILITY);
@@ -35,7 +40,7 @@ public class SettingsView extends JFrame {
         setLocationRelativeTo(null);
         setDefaultLookAndFeelDecorated(true);
 
-        Position position = Position.valueOf(capsLockHook.properties.getProperty(CapsLockHook.PROPERTY_LOCATION));
+        Position position = Position.valueOf(config.getProperty(CapsLockHook.PROPERTY_LOCATION));
         //35
         int TOP_PADDING = 38;
         int RECT_WIDTH = 40;
@@ -53,14 +58,14 @@ public class SettingsView extends JFrame {
             public void mouseClicked(MouseEvent e) {
                 Arrays.stream(selectableRects).forEach(selectableRect -> {
                     if(selectableRect.selected &&
-                        selectableRect.position == Position.valueOf(capsLockHook.properties.getProperty(CapsLockHook.PROPERTY_LOCATION)))  {
+                        selectableRect.position == Position.valueOf(config.getProperty(CapsLockHook.PROPERTY_LOCATION)))  {
                         return;
                     }
 
                     if(selectableRect.shape.contains(new Point(e.getX(), e.getY()))) {
                         Arrays.stream(selectableRects).forEach(selectableRoundRect -> selectableRoundRect.selected = false);
                         selectableRect.selected = true;
-                        capsLockHook.updatePosition(selectableRect.position);
+                        capsLockHook.updatePopupPosition(selectableRect.position);
                     }
                     repaint();
                 });
@@ -144,8 +149,8 @@ public class SettingsView extends JFrame {
 
             buffer.setColor(Color.GRAY);
             buffer.setFont(propertyFont);
-            float popupDelay = Float.parseFloat(capsLockHook.properties.getProperty(CapsLockHook.PROPERTY_POPUP_DELAY));
-            buffer.drawString(Util.formatWithOneDecimalPlace(popupDelay) +"s", 60, 150);
+            float popupDelay = Float.parseFloat(appConfig.getProperty(CapsLockHook.PROPERTY_POPUP_DELAY));
+            buffer.drawString(Helpers.formatWithOneDecimalPlace(popupDelay) +"s", 60, 150);
 
             g.drawImage(offScreen, 0, 0, this);
         }
