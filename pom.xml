@@ -6,7 +6,7 @@
 
     <groupId>bittwisted.co.uk</groupId>
     <artifactId>cap-locks-popup</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.1</version>
     <organization/>
     <build>
         <plugins>
@@ -15,8 +15,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.11.0</version>
                 <configuration>
-                    <source>8</source>
-                    <target>8</target>
+                    <source>19</source>
+                    <target>19</target>
                 </configuration>
             </plugin>
             <plugin>
@@ -24,7 +24,7 @@
                 <version>3.4.2</version>
                 <configuration>
                     <appendAssemblyId>false</appendAssemblyId>
-                    <finalName>CapLockHook</finalName>
+                    <finalName>CapUp-${project.version}</finalName>
                     <archive>
                         <manifest>
                             <mainClass>CapsLockHook</mainClass>
@@ -45,10 +45,63 @@
                 </executions>
             </plugin>
             <plugin>
+                <groupId>org.panteleyev</groupId>
+                <artifactId>jpackage-maven-plugin</artifactId>
+                <version>1.6.5</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>jpackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <!-- Define configuration options for jpackage -->
+                    <input>${project.build.directory}</input> <!-- Directory containing the JAR -->
+                    <mainJar>CapUp-${project.version}.jar</mainJar> <!-- The JAR file to be bundled -->
+                    <mainClass>CapsLockHook</mainClass> <!-- Main class with the 'main' method -->
+                    <name>CapUp</name> <!-- Name of the application -->
+                    <icon>src/main/resources/icon.ico</icon> <!-- Optional: Icon for the executable -->
+                    <appVersion>${project.version}</appVersion> <!-- App version -->
+                    <type>MSI</type> <!-- The output type (exe for Windows) -->
+                    <runtimeImage>${java.home}</runtimeImage> <!-- Optional: Custom JRE, use if needed -->
+                    <copyright>BIT TWISTED LTD 2024</copyright>
+                    <winDirChooser>true</winDirChooser>
+                    <winMenu>true</winMenu>
+                    <winShortcut>true</winShortcut>
+                    <resourceDir>installer</resourceDir>
+                    <destination>${project.build.directory}/dist/windows</destination>
+                </configuration>
+            </plugin>
+           <!-- <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>3.0.0</version>
                 <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>jpackage</executable>
+                            <arguments>
+                                <argument>&#45;&#45;input</argument>
+                                <argument>${project.build.directory}</argument>
+                                <argument>&#45;&#45;name</argument>
+                                <argument>CapUp</argument>
+                                <argument>&#45;&#45;main-jar</argument>
+                                <argument>CapUp-${project.version}.jar</argument>
+                                <argument>&#45;&#45;main-class</argument>
+                                <argument>CapsLockHook</argument>
+                                <argument>&#45;&#45;type</argument>
+                                <argument>exe</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                </executions>
+
+                &lt;!&ndash;<executions>
                     <execution>
                         <id>compile-nsis-script</id>
                         <phase>package</phase>
@@ -73,8 +126,8 @@
                             <commandlineArgs>sign /fd certHash /f "${project.basedir}/cert/sign_cert.pfx" /p "${env.CODE_SIGN_CERT_PASSWORD}" /t http://timestamp.digicert.com "${project.basedir}/target/CapLockHook.exe"</commandlineArgs>
                         </configuration>
                     </execution>
-                </executions>
-            </plugin>
+                </executions>&ndash;&gt;
+            </plugin>-->
         </plugins>
     </build>
 
@@ -92,6 +145,11 @@
             <groupId>com.1stleg</groupId>
             <artifactId>jnativehook</artifactId>
             <version>2.0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.panteleyev</groupId>
+            <artifactId>jpackage-maven-plugin</artifactId>
+            <version>1.6.5</version>
         </dependency>
     </dependencies>
 
