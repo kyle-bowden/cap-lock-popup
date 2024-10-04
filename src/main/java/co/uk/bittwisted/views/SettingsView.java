@@ -46,7 +46,7 @@ public class SettingsView extends JFrame {
         setLocationRelativeTo(null);
         setDefaultLookAndFeelDecorated(true);
 
-        Position position = Position.valueOf(config.getProperty(CapsLockHook.PROPERTY_LOCATION));
+        Position position = Position.valueOf(config.getLocation());
         //35
         int TOP_PADDING = 38;
         int RECT_WIDTH = 40;
@@ -64,7 +64,7 @@ public class SettingsView extends JFrame {
             public void mouseClicked(MouseEvent e) {
                 Arrays.stream(selectableRects).forEach(selectableRect -> {
                     if(selectableRect.selected &&
-                        selectableRect.position == Position.valueOf(config.getProperty(CapsLockHook.PROPERTY_LOCATION)))  {
+                        selectableRect.position == Position.valueOf(config.getLocation()))  {
                         return;
                     }
 
@@ -155,7 +155,7 @@ public class SettingsView extends JFrame {
 
             buffer.setColor(Color.GRAY);
             buffer.setFont(propertyFont);
-            float popupDelay = Float.parseFloat(appConfig.getProperty(CapsLockHook.PROPERTY_POPUP_DELAY));
+            float popupDelay = Float.parseFloat(appConfig.getPopUpDelay());
             buffer.drawString(Helpers.formatWithOneDecimalPlace(popupDelay) +"s", 60, 150);
 
             g.drawImage(offScreen, 0, 0, this);

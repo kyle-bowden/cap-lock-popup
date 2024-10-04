@@ -46,6 +46,7 @@ public class CapsLockHook extends JFrame implements NativeKeyListener {
     private final Point bottomCenter;
 
     private final AppConfig appConfig;
+    private final String appDataFolderPath = System.getenv("APPDATA") + "\\cap-lock-hook";
 
     private final GradientPaint defaultBackgroundGradient;
     private final AnalyticService analyticService;
@@ -54,7 +55,7 @@ public class CapsLockHook extends JFrame implements NativeKeyListener {
     public static final String PROPERTY_POPUP_DELAY = "popupDelay";
 
     public CapsLockHook() throws AWTException {
-        setTitle("Cap Lock Hook");
+        setTitle("CapUp");
         setType(Type.UTILITY);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(100, 100);
@@ -66,8 +67,8 @@ public class CapsLockHook extends JFrame implements NativeKeyListener {
         setShape(new RoundRectangle2D.Double(0, 0, getWidth(), getHeight(), 30, 30));
 
         robot = new Robot();
-        appConfig = new AppConfig();
-        analyticService = new AnalyticService(appConfig.getProperty(PROPERTY_CLIENT_ID));
+        appConfig = new AppConfig(appDataFolderPath);
+        analyticService = new AnalyticService(appConfig.getClientId());
         defaultBackgroundGradient = new GradientPaint(100, 0, Color.BLACK, getWidth()+50, getHeight(), Color.GRAY);
 
         GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
@@ -100,7 +101,7 @@ public class CapsLockHook extends JFrame implements NativeKeyListener {
             settingsView.showSettings();
         }
 
-        updatePopupPosition(Position.valueOf(appConfig.getProperty(PROPERTY_LOCATION)));
+        updatePopupPosition(Position.valueOf(appConfig.getLocation()));
     }
 
     private void setupSystemTray() {
@@ -109,7 +110,7 @@ public class CapsLockHook extends JFrame implements NativeKeyListener {
         } else {
             SystemTray tray = SystemTray.getSystemTray();
 
-            ImageIcon icon = new ImageIcon(Objects.requireNonNull(CapsLockHook.class.getResource("icon_tray.png")));
+            ImageIcon icon = new ImageIcon(Objects.requireNonNull(ClassLoader.getSystemResource("icon_tray.png")));
             Image image = icon.getImage();
 
             PopupMenu popupMenu = new PopupMenu();
@@ -252,12 +253,12 @@ public class CapsLockHook extends JFrame implements NativeKeyListener {
             case BOTTOM_RIGHT: setLocation(bottomRight); break;
             case BOTTOM_CENTER: setLocation(bottomCenter); break;
         }
-        appConfig.updateConfig(position, appConfig.getProperty(PROPERTY_POPUP_DELAY));
+        appConfig.updateConfig(position, appConfig.getPopUpDelay());
         showCapsLockStatusPopup();
     }
 
     public void updatePopupDelay(boolean isUp) {
-        float popupDelay = Float.parseFloat(appConfig.getProperty(PROPERTY_POPUP_DELAY));
+        float popupDelay = Float.parseFloat(appConfig.getPopUpDelay());
         if(isUp) {
             if(popupDelay < 5f) {
                 popupDelay += .5f;
@@ -272,7 +273,7 @@ public class CapsLockHook extends JFrame implements NativeKeyListener {
             }
         }
         appConfig.updateConfig(
-                Position.valueOf(appConfig.getProperty(PROPERTY_LOCATION)),
+                Position.valueOf(appConfig.getLocation()),
                 Helpers.formatWithOneDecimalPlace(popupDelay));
         setVisible(false);
         showCapsLockStatusPopup();
@@ -342,7 +343,7 @@ public class CapsLockHook extends JFrame implements NativeKeyListener {
     }
 
     private void hidePopup() {
-        float popupDelay = Float.parseFloat(appConfig.getProperty(PROPERTY_POPUP_DELAY));
+        float popupDelay = Float.parseFloat(appConfig.getPopUpDelay());
         if(timer != null) timer.stop();
         timer = new Timer((int)popupDelay * 1000, e -> {
             setVisible(false);
