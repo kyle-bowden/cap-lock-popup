@@ -34,7 +34,7 @@ public class CapsLockHook extends JFrame implements NativeKeyListener {
     private final Font defaultFont = new Font("Arial Black", Font.PLAIN, 50);
     private final Logger logger = Logger.getLogger(CapsLockHook.class.getName());
     private final SettingsView settingsView;
-    private boolean capsLockState;
+    private boolean capsLockOn;
     private boolean isSuccessPopup;
     private boolean RESET_IN_ACTION = false;
 
@@ -50,9 +50,6 @@ public class CapsLockHook extends JFrame implements NativeKeyListener {
 
     private final GradientPaint defaultBackgroundGradient;
     private final AnalyticService analyticService;
-    public static final String PROPERTY_LOCATION = "location";
-    public static final String PROPERTY_CLIENT_ID = "clientId";
-    public static final String PROPERTY_POPUP_DELAY = "popupDelay";
 
     public CapsLockHook() throws AWTException {
         setTitle("CapUp");
@@ -85,7 +82,7 @@ public class CapsLockHook extends JFrame implements NativeKeyListener {
 
         // get initial state of cap lock
         Toolkit kit = Toolkit.getDefaultToolkit();
-        capsLockState = kit.getLockingKeyState(KeyEvent.VK_CAPS_LOCK);
+        capsLockOn = kit.getLockingKeyState(KeyEvent.VK_CAPS_LOCK);
 
         addMouseListener(new MouseAdapter() {
             @Override
@@ -159,7 +156,7 @@ public class CapsLockHook extends JFrame implements NativeKeyListener {
     public void paint(Graphics g) {
         super.paint(g);
 
-        String message = capsLockState ? "A" : "a";
+        String message = capsLockOn ? "A" : "a";
 
         Graphics2D g2d = (Graphics2D) g;
         g2d.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
@@ -208,7 +205,7 @@ public class CapsLockHook extends JFrame implements NativeKeyListener {
 
     private void flipCapLockState() {
         if(RESET_IN_ACTION) return;
-        capsLockState = !capsLockState;
+        capsLockOn = !capsLockOn;
 
         RESET_IN_ACTION = true;
         Timer timer = new Timer(500, t -> {
@@ -368,7 +365,7 @@ public class CapsLockHook extends JFrame implements NativeKeyListener {
     public void nativeKeyPressed(NativeKeyEvent e) {
         if (e.getKeyCode() == NativeKeyEvent.VC_CAPS_LOCK) {
             RESET_IN_ACTION = false;
-            capsLockState = !capsLockState;
+            capsLockOn = !capsLockOn;
             showCapsLockStatusPopup();
         }
 

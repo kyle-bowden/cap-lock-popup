@@ -18,12 +18,15 @@ import java.util.Arrays;
 
 public class SettingsView extends JFrame {
     private final int WINDOW_WIDTH = 250;
-    private final int WINDOW_HEIGHT = 250;
-    private final SelectableRoundRect[] selectableRects = new SelectableRoundRect[6];
+    private final int WINDOW_HEIGHT = 350;
+    private String positionInfoLabel;
+    private String delayInfoLabel;
+    private final SelectableRoundRect[] selectablePositionRects = new SelectableRoundRect[6];
 
     private final AppConfig appConfig;
 
     public final Font defaultFont = new Font("Arial Black", Font.PLAIN, 25);
+    public final Font defaultFontSmall = new Font("Arial Black", Font.PLAIN, 16);
     public final Font propertyFont = new Font("Arial Black", Font.PLAIN, 50);
     private final CapsLockHook capsLockHook;
 
@@ -42,35 +45,39 @@ public class SettingsView extends JFrame {
         setTitle("Settings");
         setType(Type.UTILITY);
         setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-        setSize(250, 250);
+        setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
         setLocationRelativeTo(null);
         setDefaultLookAndFeelDecorated(true);
 
         Position position = Position.valueOf(config.getLocation());
+        String delay = config.getPopUpDelay();
+        positionInfoLabel = "Position: " + position.name().replace("_", " ").toLowerCase();
+        delayInfoLabel = "Popup Delay (sec): " + delay;
         //35
         int TOP_PADDING = 38;
         int RECT_WIDTH = 40;
         //12
         int OFFSET = 15;
-        selectableRects[0] = new SelectableRoundRect(OFFSET, TOP_PADDING, RECT_WIDTH, RECT_WIDTH, position == Position.TOP_LEFT, Position.TOP_LEFT);
-        selectableRects[1] = new SelectableRoundRect(WINDOW_WIDTH - OFFSET - RECT_WIDTH, TOP_PADDING, RECT_WIDTH, RECT_WIDTH, position == Position.TOP_RIGHT, Position.TOP_RIGHT);
-        selectableRects[2] = new SelectableRoundRect(OFFSET, WINDOW_WIDTH - OFFSET - RECT_WIDTH, RECT_WIDTH, RECT_WIDTH, position == Position.BOTTOM_LEFT, Position.BOTTOM_LEFT);
-        selectableRects[3] = new SelectableRoundRect(WINDOW_WIDTH - OFFSET - RECT_WIDTH, WINDOW_WIDTH - OFFSET - RECT_WIDTH, RECT_WIDTH, RECT_WIDTH, position == Position.BOTTOM_RIGHT, Position.BOTTOM_RIGHT);
-        selectableRects[4] = new SelectableRoundRect(WINDOW_WIDTH / 2 - RECT_WIDTH / 2, TOP_PADDING, RECT_WIDTH, RECT_WIDTH, position == Position.TOP_CENTER, Position.TOP_CENTER);
-        selectableRects[5] = new SelectableRoundRect(WINDOW_WIDTH / 2 - RECT_WIDTH / 2, WINDOW_WIDTH - OFFSET - RECT_WIDTH, RECT_WIDTH, RECT_WIDTH, position == Position.BOTTOM_CENTER, Position.BOTTOM_CENTER);
+        selectablePositionRects[0] = new SelectableRoundRect(OFFSET, TOP_PADDING, RECT_WIDTH, RECT_WIDTH, position == Position.TOP_LEFT, Position.TOP_LEFT);
+        selectablePositionRects[1] = new SelectableRoundRect(WINDOW_WIDTH - OFFSET - RECT_WIDTH, TOP_PADDING, RECT_WIDTH, RECT_WIDTH, position == Position.TOP_RIGHT, Position.TOP_RIGHT);
+        selectablePositionRects[2] = new SelectableRoundRect(OFFSET, WINDOW_WIDTH - OFFSET - RECT_WIDTH, RECT_WIDTH, RECT_WIDTH, position == Position.BOTTOM_LEFT, Position.BOTTOM_LEFT);
+        selectablePositionRects[3] = new SelectableRoundRect(WINDOW_WIDTH - OFFSET - RECT_WIDTH, WINDOW_WIDTH - OFFSET - RECT_WIDTH, RECT_WIDTH, RECT_WIDTH, position == Position.BOTTOM_RIGHT, Position.BOTTOM_RIGHT);
+        selectablePositionRects[4] = new SelectableRoundRect(WINDOW_WIDTH / 2 - RECT_WIDTH / 2, TOP_PADDING, RECT_WIDTH, RECT_WIDTH, position == Position.TOP_CENTER, Position.TOP_CENTER);
+        selectablePositionRects[5] = new SelectableRoundRect(WINDOW_WIDTH / 2 - RECT_WIDTH / 2, WINDOW_WIDTH - OFFSET - RECT_WIDTH, RECT_WIDTH, RECT_WIDTH, position == Position.BOTTOM_CENTER, Position.BOTTOM_CENTER);
 
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                Arrays.stream(selectableRects).forEach(selectableRect -> {
+                Arrays.stream(selectablePositionRects).forEach(selectableRect -> {
                     if(selectableRect.selected &&
                         selectableRect.position == Position.valueOf(config.getLocation()))  {
                         return;
                     }
 
                     if(selectableRect.shape.contains(new Point(e.getX(), e.getY()))) {
-                        Arrays.stream(selectableRects).forEach(selectableRoundRect -> selectableRoundRect.selected = false);
+                        Arrays.stream(selectablePositionRects).forEach(selectableRoundRect -> selectableRoundRect.selected = false);
                         selectableRect.selected = true;
+                        positionInfoLabel = "Position: " + selectableRect.position.name().replace("_", " ").toLowerCase();
                         capsLockHook.updatePopupPosition(selectableRect.position);
                     }
                     repaint();
@@ -78,14 +85,15 @@ public class SettingsView extends JFrame {
 
                 upArrow.selected = upArrow.shape.contains(new Point(e.getX(), e.getY()));
                 if(upArrow.selected) {
-                    System.out.println("Up");
                     capsLockHook.updatePopupDelay(true);
+                    delayInfoLabel = "Popup Delay (sec): " + appConfig.getPopUpDelay();
                 }
                 downArrow.selected = downArrow.shape.contains(new Point(e.getX(), e.getY()));
                 if(downArrow.selected) {
-                    System.out.println("Down");
                     capsLockHook.updatePopupDelay(false);
+                    delayInfoLabel = "Popup Delay (sec): " + appConfig.getPopUpDelay();
                 }
+
                 repaint();
             }
         });
@@ -94,21 +102,21 @@ public class SettingsView extends JFrame {
             @Override
             public void mouseMoved(MouseEvent e) {
                 super.mouseMoved(e);
-                Arrays.stream(selectableRects).forEach(selectableRect -> {
+                Arrays.stream(selectablePositionRects).forEach(selectableRect -> {
                     selectableRect.focused = selectableRect.shape.contains(new Point(e.getX(), e.getY()));
                     repaint();
                 });
 
-                upArrow.focused = upArrow.shape.contains(new Point(e.getX(), e.getY()));
-                downArrow.focused = downArrow.shape.contains(new Point(e.getX(), e.getY()));
+                upArrow.focused     = upArrow.shape.contains(new Point(e.getX(), e.getY()));
+                downArrow.focused   = downArrow.shape.contains(new Point(e.getX(), e.getY()));
             }
         });
 
-        setAlwaysOnTop(true);
-
         setVisible(true);
+        setAlwaysOnTop(true);
         offScreen = createImage(WINDOW_WIDTH, WINDOW_HEIGHT);
         buffer = (Graphics2D) offScreen.getGraphics();
+
         setVisible(false);
     }
 
@@ -131,7 +139,16 @@ public class SettingsView extends JFrame {
             buffer.setPaint(defaultBackgroundGradient);
             buffer.fillRect(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 
-            Arrays.stream(selectableRects).forEach(selectableRect -> {
+            buffer.setColor(Color.WHITE);
+            int centerHeight = 250;
+            buffer.drawLine(0, centerHeight, WINDOW_WIDTH, centerHeight);
+            buffer.setFont(defaultFontSmall);
+            buffer.drawString(delayInfoLabel, 15, centerHeight + 25);
+            buffer.drawString(positionInfoLabel, 15, centerHeight + 50);
+            buffer.drawLine(0, centerHeight + 65, WINDOW_WIDTH, centerHeight + 65);
+            buffer.drawString("BIT TWISTED LTD     v1.0", 15, centerHeight + 85);
+
+            Arrays.stream(selectablePositionRects).forEach(selectableRect -> {
                 if (selectableRect.selected) {
                     buffer.setColor(Color.WHITE);
                     buffer.fill(selectableRect.shape);
