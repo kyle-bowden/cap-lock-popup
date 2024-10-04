@@ -1,4 +1,4 @@
-package enums;
+package co.uk.bittwisted.enums;
 
 public enum Position {
     TOP_LEFT,

@@ -1,7 +1,7 @@
-package config;
+package co.uk.bittwisted.config;
 
-import enums.Position;
-import util.Helpers;
+import co.uk.bittwisted.enums.Position;
+import co.uk.bittwisted.util.Helpers;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -25,9 +25,11 @@ public class AppConfig {
 
     private boolean isFirstTimeUser;
 
-    public AppConfig() {
-        String appDataFolder = System.getenv("APPDATA") + "\\cap-lock-hook";
-        File settingsDir = new File(appDataFolder);
+    public static Position DEFAULT_POSITION = Position.BOTTOM_RIGHT;
+    public static String DEFAULT_POPUP_DELAY = Helpers.formatWithOneDecimalPlace(2f);
+
+    public AppConfig(String appDataFolderPath) {
+        File settingsDir = new File(appDataFolderPath);
         if(!settingsDir.exists()) {
             boolean success = settingsDir.mkdir();
             if(!success) {
@@ -36,12 +38,14 @@ public class AppConfig {
             }
         }
 
-        properties = new Properties();
         String configFileName = "caplockhook.properties";
-        configFile = new File(appDataFolder, configFileName);
+
+        properties = new Properties();
+        configFile = new File(appDataFolderPath, configFileName);
+
         if(!configFile.exists()) {
             properties.setProperty(PROPERTY_CLIENT_ID, UUID.randomUUID().toString());
-            updateConfig(Position.BOTTOM_RIGHT, Helpers.formatWithOneDecimalPlace(2f));
+            updateConfig(DEFAULT_POSITION, DEFAULT_POPUP_DELAY);
             isFirstTimeUser = true;
         } else {
             try (FileInputStream input = new FileInputStream(configFile)) {
@@ -75,13 +79,15 @@ public class AppConfig {
         return isFirstTimeUser;
     }
 
-    public String getProperty(String key) {
-        if(Optional.ofNullable(properties).isPresent()) {
-            return properties.getProperty(key);
-        } else {
-            logger.log(Level.SEVERE, "Property could not be fetched.", key);
-            System.exit(1);
-        }
-        return null;
+    public String getLocation() {
+        return properties.getProperty(PROPERTY_LOCATION);
+    }
+
+    public String getClientId() {
+        return properties.getProperty(PROPERTY_CLIENT_ID);
+    }
+
+    public String getPopUpDelay() {
+        return properties.getProperty(PROPERTY_POPUP_DELAY);
     }
 }

@@ -1,13 +1,19 @@
-import config.AppConfig;
-import enums.Position;
-import util.Helpers;
+package co.uk.bittwisted.views;
+
+import co.uk.bittwisted.CapsLockHook;
+import co.uk.bittwisted.config.AppConfig;
+import co.uk.bittwisted.enums.Position;
+import co.uk.bittwisted.util.Helpers;
+import co.uk.bittwisted.views.components.SelectableDownTriangle;
+import co.uk.bittwisted.views.components.SelectableRoundRect;
+import co.uk.bittwisted.views.components.SelectableUpTriangle;
+import co.uk.bittwisted.views.components.UIComponent;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
-import java.awt.geom.RoundRectangle2D;
 import java.util.Arrays;
 
 public class SettingsView extends JFrame {
@@ -15,7 +21,7 @@ public class SettingsView extends JFrame {
     private final int WINDOW_HEIGHT = 250;
     private final SelectableRoundRect[] selectableRects = new SelectableRoundRect[6];
 
-    private AppConfig appConfig;
+    private final AppConfig appConfig;
 
     public final Font defaultFont = new Font("Arial Black", Font.PLAIN, 25);
     public final Font propertyFont = new Font("Arial Black", Font.PLAIN, 50);
@@ -40,7 +46,7 @@ public class SettingsView extends JFrame {
         setLocationRelativeTo(null);
         setDefaultLookAndFeelDecorated(true);
 
-        Position position = Position.valueOf(config.getProperty(CapsLockHook.PROPERTY_LOCATION));
+        Position position = Position.valueOf(config.getLocation());
         //35
         int TOP_PADDING = 38;
         int RECT_WIDTH = 40;
@@ -58,7 +64,7 @@ public class SettingsView extends JFrame {
             public void mouseClicked(MouseEvent e) {
                 Arrays.stream(selectableRects).forEach(selectableRect -> {
                     if(selectableRect.selected &&
-                        selectableRect.position == Position.valueOf(config.getProperty(CapsLockHook.PROPERTY_LOCATION)))  {
+                        selectableRect.position == Position.valueOf(config.getLocation()))  {
                         return;
                     }
 
@@ -149,7 +155,7 @@ public class SettingsView extends JFrame {
 
             buffer.setColor(Color.GRAY);
             buffer.setFont(propertyFont);
-            float popupDelay = Float.parseFloat(appConfig.getProperty(CapsLockHook.PROPERTY_POPUP_DELAY));
+            float popupDelay = Float.parseFloat(appConfig.getPopUpDelay());
             buffer.drawString(Helpers.formatWithOneDecimalPlace(popupDelay) +"s", 60, 150);
 
             g.drawImage(offScreen, 0, 0, this);
@@ -167,52 +173,5 @@ public class SettingsView extends JFrame {
 
     public void showSettings() {
         setVisible(true);
-    }
-
-    public static class UIComponent {
-        public boolean focused;
-        public boolean selected;
-
-        public final Position position;
-        public Shape shape;
-
-        public UIComponent() {
-            this.selected = false;
-            position = Position.NONE;
-        }
-
-        public UIComponent(boolean s, Position p) {
-            this.selected = s;
-            this.position = p;
-        }
-    }
-
-    public static class SelectableRoundRect extends UIComponent {
-        public SelectableRoundRect(int x, int y, int w, int h, boolean s, Position p) {
-            super(s, p);
-            this.shape = new RoundRectangle2D.Double(x, y, w, h, 10, 10);
-        }
-    }
-
-    public static class SelectableUpTriangle extends UIComponent {
-        public SelectableUpTriangle(int x, int y) {
-            super();
-            this.shape = new Polygon(
-                    new int[]{x, x+25, x+12},
-                    new int[]{y+25, y+25, y},
-                    3
-            );
-        }
-    }
-
-    public static class SelectableDownTriangle extends UIComponent {
-        public SelectableDownTriangle(int x, int y) {
-            super();
-            this.shape = new Polygon(
-                    new int[]{x, x+25, x+12},
-                    new int[]{y, y, y+25},
-                    3
-            );
-        }
     }
 }

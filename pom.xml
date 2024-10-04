@@ -4,9 +4,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>bittwisted.co.uk</groupId>
+    <groupId>co.uk.bittwisted</groupId>
     <artifactId>cap-locks-popup</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
     <organization/>
     <build>
         <plugins>
@@ -25,9 +25,10 @@
                 <configuration>
                     <appendAssemblyId>false</appendAssemblyId>
                     <finalName>CapUp-${project.version}</finalName>
+                    <outputDirectory>${project.build.directory}/final-jar</outputDirectory>
                     <archive>
                         <manifest>
-                            <mainClass>CapsLockHook</mainClass>
+                            <mainClass>co.uk.bittwisted.CapsLockHook</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>
@@ -56,10 +57,9 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <!-- Define configuration options for jpackage -->
-                    <input>${project.build.directory}</input> <!-- Directory containing the JAR -->
+                    <input>${project.build.directory}/final-jar</input> <!-- Directory containing the JAR -->
                     <mainJar>CapUp-${project.version}.jar</mainJar> <!-- The JAR file to be bundled -->
-                    <mainClass>CapsLockHook</mainClass> <!-- Main class with the 'main' method -->
+                    <mainClass>co.uk.bittwisted.CapsLockHook</mainClass> <!-- Main class with the 'main' method -->
                     <name>CapUp</name> <!-- Name of the application -->
                     <icon>src/main/resources/icon.ico</icon> <!-- Optional: Icon for the executable -->
                     <appVersion>${project.version}</appVersion> <!-- App version -->
@@ -73,61 +73,6 @@
                     <destination>${project.build.directory}/dist/windows</destination>
                 </configuration>
             </plugin>
-           <!-- <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>3.0.0</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <configuration>
-                            <executable>jpackage</executable>
-                            <arguments>
-                                <argument>&#45;&#45;input</argument>
-                                <argument>${project.build.directory}</argument>
-                                <argument>&#45;&#45;name</argument>
-                                <argument>CapUp</argument>
-                                <argument>&#45;&#45;main-jar</argument>
-                                <argument>CapUp-${project.version}.jar</argument>
-                                <argument>&#45;&#45;main-class</argument>
-                                <argument>CapsLockHook</argument>
-                                <argument>&#45;&#45;type</argument>
-                                <argument>exe</argument>
-                            </arguments>
-                        </configuration>
-                    </execution>
-                </executions>
-
-                &lt;!&ndash;<executions>
-                    <execution>
-                        <id>compile-nsis-script</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <configuration>
-                            <executable>C:\Program Files (x86)\NSIS\makensis.exe</executable>
-                            <arguments>
-                                <argument>${project.basedir}/installer/setup.nsi</argument>
-                            </arguments>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>code-sign</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <configuration>
-                            <executable>C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x64\signtool.exe</executable>
-                            <commandlineArgs>sign /fd certHash /f "${project.basedir}/cert/sign_cert.pfx" /p "${env.CODE_SIGN_CERT_PASSWORD}" /t http://timestamp.digicert.com "${project.basedir}/target/CapLockHook.exe"</commandlineArgs>
-                        </configuration>
-                    </execution>
-                </executions>&ndash;&gt;
-            </plugin>-->
         </plugins>
     </build>
 
