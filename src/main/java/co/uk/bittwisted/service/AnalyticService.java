@@ -1,4 +1,4 @@
-package service;
+package co.uk.bittwisted.service;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;

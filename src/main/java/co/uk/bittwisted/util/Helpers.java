@@ -1,4 +1,4 @@
-package util;
+package co.uk.bittwisted.util;
 
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;

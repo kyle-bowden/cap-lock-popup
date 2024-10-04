@@ -6,7 +6,7 @@
 
     <groupId>bittwisted.co.uk</groupId>
     <artifactId>cap-locks-popup</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
     <organization/>
     <build>
         <plugins>
@@ -25,6 +25,7 @@
                 <configuration>
                     <appendAssemblyId>false</appendAssemblyId>
                     <finalName>CapUp-${project.version}</finalName>
+                    <outputDirectory>${project.build.directory}/final-jar</outputDirectory>
                     <archive>
                         <manifest>
                             <mainClass>CapsLockHook</mainClass>
@@ -57,7 +58,7 @@
                 </executions>
                 <configuration>
                     <!-- Define configuration options for jpackage -->
-                    <input>${project.build.directory}</input> <!-- Directory containing the JAR -->
+                    <input>${project.build.directory}/final-jar</input> <!-- Directory containing the JAR -->
                     <mainJar>CapUp-${project.version}.jar</mainJar> <!-- The JAR file to be bundled -->
                     <mainClass>CapsLockHook</mainClass> <!-- Main class with the 'main' method -->
                     <name>CapUp</name> <!-- Name of the application -->

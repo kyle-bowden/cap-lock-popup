@@ -1,12 +1,15 @@
-import config.AppConfig;
-import enums.Position;
+package co.uk.bittwisted;
+
+import co.uk.bittwisted.config.AppConfig;
+import co.uk.bittwisted.enums.Position;
+import co.uk.bittwisted.service.AnalyticService;
+import co.uk.bittwisted.util.Helpers;
+import co.uk.bittwisted.views.SettingsView;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
 import org.jnativehook.NativeInputEvent;
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
-import service.AnalyticService;
-import util.Helpers;
 
 import javax.swing.*;
 import javax.swing.plaf.metal.DefaultMetalTheme;

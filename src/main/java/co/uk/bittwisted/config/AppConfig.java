@@ -1,7 +1,7 @@
-package config;
+package co.uk.bittwisted.config;
 
-import enums.Position;
-import util.Helpers;
+import co.uk.bittwisted.enums.Position;
+import co.uk.bittwisted.util.Helpers;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -26,8 +26,8 @@ public class AppConfig {
     private boolean isFirstTimeUser;
 
     public AppConfig() {
-        String appDataFolder = System.getenv("APPDATA") + "\\cap-lock-hook";
-        File settingsDir = new File(appDataFolder);
+        String appDataFolderPath = System.getenv("APPDATA") + "\\cap-lock-hook";
+        File settingsDir = new File(appDataFolderPath);
         if(!settingsDir.exists()) {
             boolean success = settingsDir.mkdir();
             if(!success) {
@@ -38,7 +38,7 @@ public class AppConfig {
 
         properties = new Properties();
         String configFileName = "caplockhook.properties";
-        configFile = new File(appDataFolder, configFileName);
+        configFile = new File(appDataFolderPath, configFileName);
         if(!configFile.exists()) {
             properties.setProperty(PROPERTY_CLIENT_ID, UUID.randomUUID().toString());
             updateConfig(Position.BOTTOM_RIGHT, Helpers.formatWithOneDecimalPlace(2f));
