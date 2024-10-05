@@ -4,6 +4,7 @@ import co.uk.bittwisted.config.AppConfig;
 import co.uk.bittwisted.enums.Position;
 import co.uk.bittwisted.service.AnalyticService;
 import co.uk.bittwisted.util.Helpers;
+import co.uk.bittwisted.views.InfoView;
 import co.uk.bittwisted.views.SettingsView;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
@@ -33,6 +34,7 @@ public class CapsLockHook extends JFrame implements NativeKeyListener {
     private final Robot robot;
     private final Font defaultFont = new Font("Arial Black", Font.PLAIN, 50);
     private final Logger logger = Logger.getLogger(CapsLockHook.class.getName());
+    private final InfoView infoView;
     private final SettingsView settingsView;
     private boolean capsLockOn;
     private boolean isSuccessPopup;
@@ -94,8 +96,11 @@ public class CapsLockHook extends JFrame implements NativeKeyListener {
         Runtime.getRuntime().addShutdownHook(new Thread(this::stopCapsLockHook));
 
         settingsView = new SettingsView(this, appConfig);
+        infoView = new InfoView(settingsView);
+        settingsView.setInfoView(infoView);
         if(appConfig.isFirstTimeUser())  {
             settingsView.showSettings();
+            infoView.showInfo();
         }
 
         updatePopupPosition(Position.valueOf(appConfig.getLocation()));

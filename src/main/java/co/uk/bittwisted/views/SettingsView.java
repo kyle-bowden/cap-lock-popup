@@ -7,6 +7,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -16,8 +18,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class SettingsView extends JFrame {
-    private static final org.slf4j.Logger log = LoggerFactory.getLogger(SettingsView.class);
     private final AppConfig appConfig;
+    private InfoView infoView;
 
     private final Logger logger = Logger.getLogger(SettingsView.class.getName());
 
@@ -25,7 +27,6 @@ public class SettingsView extends JFrame {
     private final int WINDOW_HEIGHT = 288;
 
     public final Font defaultFont = new Font("Arial", Font.PLAIN, 18);
-    public final Font createdByFont = new Font("Arial", Font.BOLD, 12);
     public final Font infoFont = new Font("Arial", Font.ITALIC, 14);
 
     public SettingsView(CapsLockHook clh, AppConfig config) {
@@ -33,6 +34,7 @@ public class SettingsView extends JFrame {
 
         setTitle("CapUp v1.1.0");
         setResizable(false);
+        setAlwaysOnTop(true);
         setType(Type.UTILITY);
         setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -46,7 +48,7 @@ public class SettingsView extends JFrame {
         add(popupPositionSelector);
 
         JPanel panel = new JPanel();
-        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 0));
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
         JCheckBox checkBoxAutoStartup = new JCheckBox("Startup on login");
@@ -104,32 +106,39 @@ public class SettingsView extends JFrame {
 
         panel.add(checkBoxAutoStartup);
         panel.add(Box.createRigidArea(new Dimension(0, 0)));
-        JLabel autoStartupLabel = new JLabel("<html>(Auto start this application after restarts.)</html>");
+        JLabel autoStartupLabel = new JLabel("<html><span style=\"color:gray\">(Auto start this application after restarts.)</span></html>");
         autoStartupLabel.setFont(infoFont);
         autoStartupLabel.setPreferredSize(new Dimension(50, 50));
         panel.add(autoStartupLabel);
 
         panel.add(checkBoxMinimiseOnStart);
         panel.add(Box.createRigidArea(new Dimension(0, 0)));
-        JLabel minimiseOnStartupLabel = new JLabel("<html>(Minimise to system tray on launch.)</html>");
+        JLabel minimiseOnStartupLabel = new JLabel("<html><span style=\"color:gray\">(Minimise to system tray on launch.)</span></html>");
         minimiseOnStartupLabel.setFont(infoFont);
         minimiseOnStartupLabel.setPreferredSize(new Dimension(50, 50));
         panel.add(minimiseOnStartupLabel);
 
         panel.add(checkBoxQuickFixToggle);
         panel.add(Box.createRigidArea(new Dimension(20, 0)));
-        JLabel quickFixLabel = new JLabel("<html>(Use Quick Fix with <span style=\"font-weight:500\">`Left-Control + Q`</span> to convert highlighted uppercase text to lowercase.)</html>\n");
+        JLabel quickFixLabel = new JLabel("<html><span style=\"color:gray\">(Use Quick Fix with <span style=\"font-weight:500\">`Left-Control + Q`</span> to convert highlighted uppercase text to lowercase.)</span></html>\n");
         quickFixLabel.setFont(infoFont);
         quickFixLabel.setPreferredSize(new Dimension(50, 50));
         panel.add(quickFixLabel);
 
         panel.add(Box.createRigidArea(new Dimension(0, 10)));
-        JLabel appInfoLabel = new JLabel("<html>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style=\"color: gray\">- Created By Kyle Bowden -</span></html>");
-        appInfoLabel.setFont(createdByFont);
-        panel.add(appInfoLabel);
-        add(panel);
+        JButton infoButton = new JButton("Show Extra Info");
+        infoButton.setFont(defaultFont);
+        infoButton.setPreferredSize(new Dimension(50, 50));
 
-        setAlwaysOnTop(true);
+        infoButton.addActionListener(e -> {
+            if(infoView != null) {
+                infoView.showInfo();
+            }
+        });
+
+        panel.add(infoButton);
+
+        add(panel);
 
         boolean shouldMinimiseOnStartOnlyIfNotFirstTimeUser =
                 !appConfig.getMinimiseOnStartEnabled() && !appConfig.isFirstTimeUser();
@@ -138,5 +147,9 @@ public class SettingsView extends JFrame {
 
     public void showSettings() {
         setVisible(true);
+    }
+
+    public void setInfoView(InfoView infoView) {
+        this.infoView = infoView;
     }
 }
