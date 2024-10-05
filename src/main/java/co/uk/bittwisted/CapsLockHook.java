@@ -250,7 +250,7 @@ public class CapsLockHook extends JFrame implements NativeKeyListener {
             case BOTTOM_RIGHT: setLocation(bottomRight); break;
             case BOTTOM_CENTER: setLocation(bottomCenter); break;
         }
-        appConfig.updateConfig(position, appConfig.getPopUpDelay());
+        appConfig.updateLocation(position);
         showCapsLockStatusPopup();
     }
 
@@ -269,9 +269,7 @@ public class CapsLockHook extends JFrame implements NativeKeyListener {
                 popupDelay = 1f;
             }
         }
-        appConfig.updateConfig(
-                Position.valueOf(appConfig.getLocation()),
-                Helpers.formatWithOneDecimalPlace(popupDelay));
+        appConfig.updatePopUpDelay(Helpers.formatWithOneDecimalPlace(popupDelay));
         setVisible(false);
         showCapsLockStatusPopup();
     }
