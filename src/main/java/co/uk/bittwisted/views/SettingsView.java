@@ -96,7 +96,7 @@ public class SettingsView extends JFrame {
                 appConfig.updateMinimiseOnStart(checkBoxMinimiseOnStart.isSelected()));
 
         checkBoxAutoStartup.setFont(defaultFont);
-        checkBoxAutoStartup.setSelected(true);
+        checkBoxAutoStartup.setSelected(appConfig.getAutoStartupEnabled());
         checkBoxMinimiseOnStart.setFont(defaultFont);
         checkBoxMinimiseOnStart.setSelected(appConfig.getMinimiseOnStartEnabled());
         checkBoxQuickFixToggle.setFont(defaultFont);

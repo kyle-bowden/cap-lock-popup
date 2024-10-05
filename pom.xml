@@ -84,8 +84,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
-
-
     <dependencies>
         <!-- https://mvnrepository.com/artifact/com.1stleg/jnativehook -->
         <dependency>
@@ -99,5 +97,4 @@
             <version>1.6.5</version>
         </dependency>
     </dependencies>
-
 </project>
