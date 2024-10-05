@@ -14,12 +14,11 @@ import java.awt.event.MouseMotionAdapter;
 import java.util.Arrays;
 
 public class PopupPositionSelector extends JComponent {
-    private final int WINDOW_WIDTH = 250;
-    private final int WINDOW_HEIGHT = 250;
-    private final SelectableRoundRect[] selectablePositionRects = new SelectableRoundRect[6];
-
     private final AppConfig appConfig;
-    private final CapsLockHook capsLockHook;
+
+    private final int COMPONENT_WIDTH = 250;
+    private final int COMPONENT_HEIGHT = 250;
+    private final SelectableRoundRect[] selectablePositionRects = new SelectableRoundRect[6];
 
     private Graphics2D buffer;
 
@@ -29,10 +28,9 @@ public class PopupPositionSelector extends JComponent {
     public final Font defaultFont = new Font("Arial Black", Font.PLAIN, 25);
     public final Font propertyFont = new Font("Arial Black", Font.PLAIN, 50);
     private final GradientPaint defaultBackgroundGradient =
-            new GradientPaint(0, WINDOW_HEIGHT / 2, Color.BLACK, WINDOW_WIDTH, WINDOW_HEIGHT / 2, Color.GRAY);
+            new GradientPaint(0, COMPONENT_HEIGHT / 2, Color.BLACK, COMPONENT_WIDTH, COMPONENT_HEIGHT / 2, Color.GRAY);
 
     public PopupPositionSelector(CapsLockHook clh, AppConfig appConfig) {
-        this.capsLockHook = clh;
         this.appConfig = appConfig;
 
         setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
@@ -45,11 +43,11 @@ public class PopupPositionSelector extends JComponent {
         //12
         int OFFSET = 15;
         selectablePositionRects[0] = new SelectableRoundRect(OFFSET, TOP_PADDING, RECT_WIDTH, RECT_WIDTH, position == Position.TOP_LEFT, Position.TOP_LEFT);
-        selectablePositionRects[1] = new SelectableRoundRect(WINDOW_WIDTH - OFFSET - RECT_WIDTH, TOP_PADDING, RECT_WIDTH, RECT_WIDTH, position == Position.TOP_RIGHT, Position.TOP_RIGHT);
-        selectablePositionRects[2] = new SelectableRoundRect(OFFSET, WINDOW_WIDTH - OFFSET - RECT_WIDTH, RECT_WIDTH, RECT_WIDTH, position == Position.BOTTOM_LEFT, Position.BOTTOM_LEFT);
-        selectablePositionRects[3] = new SelectableRoundRect(WINDOW_WIDTH - OFFSET - RECT_WIDTH, WINDOW_WIDTH - OFFSET - RECT_WIDTH, RECT_WIDTH, RECT_WIDTH, position == Position.BOTTOM_RIGHT, Position.BOTTOM_RIGHT);
-        selectablePositionRects[4] = new SelectableRoundRect(WINDOW_WIDTH / 2 - RECT_WIDTH / 2, TOP_PADDING, RECT_WIDTH, RECT_WIDTH, position == Position.TOP_CENTER, Position.TOP_CENTER);
-        selectablePositionRects[5] = new SelectableRoundRect(WINDOW_WIDTH / 2 - RECT_WIDTH / 2, WINDOW_WIDTH - OFFSET - RECT_WIDTH, RECT_WIDTH, RECT_WIDTH, position == Position.BOTTOM_CENTER, Position.BOTTOM_CENTER);
+        selectablePositionRects[1] = new SelectableRoundRect(COMPONENT_WIDTH - OFFSET - RECT_WIDTH, TOP_PADDING, RECT_WIDTH, RECT_WIDTH, position == Position.TOP_RIGHT, Position.TOP_RIGHT);
+        selectablePositionRects[2] = new SelectableRoundRect(OFFSET, COMPONENT_WIDTH - OFFSET - RECT_WIDTH, RECT_WIDTH, RECT_WIDTH, position == Position.BOTTOM_LEFT, Position.BOTTOM_LEFT);
+        selectablePositionRects[3] = new SelectableRoundRect(COMPONENT_WIDTH - OFFSET - RECT_WIDTH, COMPONENT_WIDTH - OFFSET - RECT_WIDTH, RECT_WIDTH, RECT_WIDTH, position == Position.BOTTOM_RIGHT, Position.BOTTOM_RIGHT);
+        selectablePositionRects[4] = new SelectableRoundRect(COMPONENT_WIDTH / 2 - RECT_WIDTH / 2, TOP_PADDING, RECT_WIDTH, RECT_WIDTH, position == Position.TOP_CENTER, Position.TOP_CENTER);
+        selectablePositionRects[5] = new SelectableRoundRect(COMPONENT_WIDTH / 2 - RECT_WIDTH / 2, COMPONENT_WIDTH - OFFSET - RECT_WIDTH, RECT_WIDTH, RECT_WIDTH, position == Position.BOTTOM_CENTER, Position.BOTTOM_CENTER);
 
         addMouseListener(new MouseAdapter() {
             @Override
@@ -116,7 +114,7 @@ public class PopupPositionSelector extends JComponent {
             buffer.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
 
             buffer.setPaint(defaultBackgroundGradient);
-            buffer.fillRect(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+            buffer.fillRect(0, 0, COMPONENT_WIDTH, COMPONENT_HEIGHT);
 
             buffer.setColor(Color.WHITE);
 

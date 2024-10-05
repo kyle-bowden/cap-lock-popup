@@ -319,7 +319,8 @@ public class CapsLockHook extends JFrame implements NativeKeyListener {
         String content = Helpers.getClipboardContentAsString();
         logger.log(Level.INFO,"Convert content:" + content);
         if(!content.isEmpty()) {
-            StringSelection selection = new StringSelection(Helpers.convertToLowerCaseWithCorrectPunctuation(content));
+            StringSelection selection =
+                    new StringSelection(Helpers.convertToLowerCaseWithCorrectPunctuation(content));
             clipboard.setContents(selection, null);
 
             // Simulate Delete to delete selected text
@@ -367,7 +368,9 @@ public class CapsLockHook extends JFrame implements NativeKeyListener {
             showCapsLockStatusPopup();
         }
 
-        if(e.getKeyCode() == NativeKeyEvent.VC_Q && e.getModifiers() == NativeInputEvent.CTRL_L_MASK) {
+        if(appConfig.getQuickFixEnabled() &&
+            e.getModifiers() == NativeInputEvent.CTRL_L_MASK &&
+                e.getKeyCode() == NativeKeyEvent.VC_Q) {
             quickFixUpperCaseText();
         }
     }
