@@ -3,11 +3,11 @@ package co.uk.bittwisted.service;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Optional;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+// TODO: Not in use as G4A requires user consent before posting events
 public class AnalyticService {
     private final Properties defaultProperties;
     private final Logger logger = Logger.getLogger(AnalyticService.class.getName());
@@ -15,7 +15,7 @@ public class AnalyticService {
     public AnalyticService(String clientId) {
         defaultProperties = new Properties();
         defaultProperties.setProperty("t", "event");
-        defaultProperties.setProperty("tid", "UA-98191047-2");
+        defaultProperties.setProperty("tid", "G-YMBFYFX9WY");
         defaultProperties.setProperty("cid", clientId);
         defaultProperties.setProperty("ev", "1");
     }
