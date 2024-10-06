@@ -2,13 +2,10 @@ package co.uk.bittwisted.views;
 
 import co.uk.bittwisted.CapsLockHook;
 import co.uk.bittwisted.config.AppConfig;
-import co.uk.bittwisted.views.components.*;
-import org.slf4j.LoggerFactory;
+import co.uk.bittwisted.views.components.PopupPositionSelector;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -40,7 +37,6 @@ public class SettingsView extends JFrame {
         setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
         setLocationRelativeTo(null);
         setDefaultLookAndFeelDecorated(true);
-        getContentPane().setBackground(Color.WHITE);
 
         setLayout(new GridLayout(1, 2));
 

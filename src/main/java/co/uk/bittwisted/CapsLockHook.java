@@ -2,10 +2,10 @@ package co.uk.bittwisted;
 
 import co.uk.bittwisted.config.AppConfig;
 import co.uk.bittwisted.enums.Position;
-import co.uk.bittwisted.service.AnalyticService;
 import co.uk.bittwisted.util.Helpers;
 import co.uk.bittwisted.views.InfoView;
 import co.uk.bittwisted.views.SettingsView;
+import com.formdev.flatlaf.FlatDarkLaf;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
 import org.jnativehook.NativeInputEvent;
@@ -13,8 +13,6 @@ import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
 
 import javax.swing.*;
-import javax.swing.plaf.metal.DefaultMetalTheme;
-import javax.swing.plaf.metal.MetalLookAndFeel;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
@@ -50,6 +48,7 @@ public class CapsLockHook extends JFrame implements NativeKeyListener {
     private final AppConfig appConfig;
     private final String appDataFolderPath = System.getenv("APPDATA") + "\\cap-lock-hook";
 
+    private final Color borderColor = new Color(187, 187, 187);
     private final GradientPaint defaultBackgroundGradient;
 
     public CapsLockHook() throws AWTException {
@@ -66,7 +65,13 @@ public class CapsLockHook extends JFrame implements NativeKeyListener {
 
         robot = new Robot();
         appConfig = new AppConfig(appDataFolderPath);
-        defaultBackgroundGradient = new GradientPaint(100, 0, Color.BLACK, getWidth()+50, getHeight(), Color.GRAY);
+        defaultBackgroundGradient = new GradientPaint(
+                100,
+                0,
+                new Color(60, 63, 65),
+                getWidth()+50,
+                getHeight(),
+                new Color(78, 80, 82));
 
         GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
         Rectangle bounds = ge.getMaximumWindowBounds();
@@ -175,7 +180,6 @@ public class CapsLockHook extends JFrame implements NativeKeyListener {
                 RenderingHints.KEY_TEXT_ANTIALIASING,
                 RenderingHints.VALUE_TEXT_ANTIALIAS_GASP);
 
-        g2d.setColor(Color.BLACK);
         g2d.setPaint(defaultBackgroundGradient);
         g2d.fillRect(0, 0, 100, 100);
 
@@ -183,7 +187,7 @@ public class CapsLockHook extends JFrame implements NativeKeyListener {
             if(RESET_IN_ACTION) {
                 g2d.setColor(Color.RED);
             } else {
-                g2d.setColor(Color.WHITE);
+                g2d.setColor(borderColor);
             }
             g2d.setFont(defaultFont);
             g2d.drawString(message, 32, 65);
@@ -200,7 +204,7 @@ public class CapsLockHook extends JFrame implements NativeKeyListener {
             g2d.draw(check);
         }
 
-        g2d.setColor(Color.white);
+        g2d.setColor(borderColor);
         g2d.setStroke(new BasicStroke(2));
         g2d.draw(new RoundRectangle2D.Double(1, 1, getWidth() - 2, getHeight() - 2, 30, 30));
         g2d.draw(new RoundRectangle2D.Double(5, 5, getWidth() - 10, getHeight() - 10, 27, 27));
@@ -349,11 +353,11 @@ public class CapsLockHook extends JFrame implements NativeKeyListener {
 
     public static void main(String[] args) {
         javax.swing.SwingUtilities.invokeLater(() -> {
-            MetalLookAndFeel.setCurrentTheme(new DefaultMetalTheme());
             try {
+                UIManager.setLookAndFeel( new FlatDarkLaf() );
                 CapsLockHook frame = new CapsLockHook();
                 frame.setVisible(false);
-            } catch (AWTException e) {
+            } catch (AWTException | UnsupportedLookAndFeelException e) {
                 throw new RuntimeException(e);
             }
         });
