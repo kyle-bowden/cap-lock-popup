@@ -6,7 +6,7 @@
 
     <groupId>co.uk.bittwisted</groupId>
     <artifactId>cap-locks-popup</artifactId>
-    <version>1.0.2</version>
+    <version>1.1.0</version>
     <organization/>
     <build>
         <plugins>
@@ -65,7 +65,9 @@
                     <appVersion>${project.version}</appVersion> <!-- App version -->
                     <type>MSI</type> <!-- The output type (exe for Windows) -->
                     <runtimeImage>${java.home}</runtimeImage> <!-- Optional: Custom JRE, use if needed -->
-                    <copyright>BIT TWISTED LTD 2024</copyright>
+                    <copyright>Kyle Bowden</copyright>
+                    <description>Simple popup for cap locks key</description>
+                    <vendor>Kyle Bowden</vendor>
                     <winDirChooser>true</winDirChooser>
                     <winMenu>true</winMenu>
                     <winShortcut>true</winShortcut>
@@ -82,8 +84,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
-
-
     <dependencies>
         <!-- https://mvnrepository.com/artifact/com.1stleg/jnativehook -->
         <dependency>
@@ -97,5 +97,4 @@
             <version>1.6.5</version>
         </dependency>
     </dependencies>
-
 </project>

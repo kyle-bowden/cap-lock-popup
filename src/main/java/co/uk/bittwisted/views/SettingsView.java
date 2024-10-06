@@ -2,176 +2,154 @@ package co.uk.bittwisted.views;
 
 import co.uk.bittwisted.CapsLockHook;
 import co.uk.bittwisted.config.AppConfig;
-import co.uk.bittwisted.enums.Position;
-import co.uk.bittwisted.util.Helpers;
-import co.uk.bittwisted.views.components.SelectableDownTriangle;
-import co.uk.bittwisted.views.components.SelectableRoundRect;
-import co.uk.bittwisted.views.components.SelectableUpTriangle;
-import co.uk.bittwisted.views.components.UIComponent;
+import co.uk.bittwisted.views.components.*;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
-import java.util.Arrays;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class SettingsView extends JFrame {
-    private final int WINDOW_WIDTH = 250;
-    private final int WINDOW_HEIGHT = 250;
-    private final SelectableRoundRect[] selectableRects = new SelectableRoundRect[6];
-
     private final AppConfig appConfig;
+    private InfoView infoView;
 
-    public final Font defaultFont = new Font("Arial Black", Font.PLAIN, 25);
-    public final Font propertyFont = new Font("Arial Black", Font.PLAIN, 50);
-    private final CapsLockHook capsLockHook;
+    private final Logger logger = Logger.getLogger(SettingsView.class.getName());
 
-    private final Image offScreen;
-    private final Graphics2D buffer;
+    private final int WINDOW_WIDTH = 525;
+    private final int WINDOW_HEIGHT = 288;
 
-    private final SelectableUpTriangle upArrow = new SelectableUpTriangle(205, 100);
-    private final SelectableDownTriangle downArrow = new SelectableDownTriangle(205, 140);
-
-    private final GradientPaint defaultBackgroundGradient = new GradientPaint(100, 0, Color.BLACK, WINDOW_WIDTH, WINDOW_HEIGHT, Color.GRAY);
+    public final Font defaultFont = new Font("Arial", Font.PLAIN, 18);
+    public final Font infoFont = new Font("Arial", Font.ITALIC, 14);
 
     public SettingsView(CapsLockHook clh, AppConfig config) {
-        this.capsLockHook = clh;
         this.appConfig = config;
 
-        setTitle("Settings");
+        setTitle("CapUp v1.1.0");
+        setResizable(false);
+        setAlwaysOnTop(true);
         setType(Type.UTILITY);
         setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-        setSize(250, 250);
+        setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
         setLocationRelativeTo(null);
         setDefaultLookAndFeelDecorated(true);
+        getContentPane().setBackground(Color.WHITE);
 
-        Position position = Position.valueOf(config.getLocation());
-        //35
-        int TOP_PADDING = 38;
-        int RECT_WIDTH = 40;
-        //12
-        int OFFSET = 15;
-        selectableRects[0] = new SelectableRoundRect(OFFSET, TOP_PADDING, RECT_WIDTH, RECT_WIDTH, position == Position.TOP_LEFT, Position.TOP_LEFT);
-        selectableRects[1] = new SelectableRoundRect(WINDOW_WIDTH - OFFSET - RECT_WIDTH, TOP_PADDING, RECT_WIDTH, RECT_WIDTH, position == Position.TOP_RIGHT, Position.TOP_RIGHT);
-        selectableRects[2] = new SelectableRoundRect(OFFSET, WINDOW_WIDTH - OFFSET - RECT_WIDTH, RECT_WIDTH, RECT_WIDTH, position == Position.BOTTOM_LEFT, Position.BOTTOM_LEFT);
-        selectableRects[3] = new SelectableRoundRect(WINDOW_WIDTH - OFFSET - RECT_WIDTH, WINDOW_WIDTH - OFFSET - RECT_WIDTH, RECT_WIDTH, RECT_WIDTH, position == Position.BOTTOM_RIGHT, Position.BOTTOM_RIGHT);
-        selectableRects[4] = new SelectableRoundRect(WINDOW_WIDTH / 2 - RECT_WIDTH / 2, TOP_PADDING, RECT_WIDTH, RECT_WIDTH, position == Position.TOP_CENTER, Position.TOP_CENTER);
-        selectableRects[5] = new SelectableRoundRect(WINDOW_WIDTH / 2 - RECT_WIDTH / 2, WINDOW_WIDTH - OFFSET - RECT_WIDTH, RECT_WIDTH, RECT_WIDTH, position == Position.BOTTOM_CENTER, Position.BOTTOM_CENTER);
+        setLayout(new GridLayout(1, 2));
 
-        addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                Arrays.stream(selectableRects).forEach(selectableRect -> {
-                    if(selectableRect.selected &&
-                        selectableRect.position == Position.valueOf(config.getLocation()))  {
-                        return;
-                    }
+        PopupPositionSelector popupPositionSelector = new PopupPositionSelector(clh, appConfig);
+        add(popupPositionSelector);
 
-                    if(selectableRect.shape.contains(new Point(e.getX(), e.getY()))) {
-                        Arrays.stream(selectableRects).forEach(selectableRoundRect -> selectableRoundRect.selected = false);
-                        selectableRect.selected = true;
-                        capsLockHook.updatePopupPosition(selectableRect.position);
-                    }
-                    repaint();
-                });
+        JPanel panel = new JPanel();
+        panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 0));
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
-                upArrow.selected = upArrow.shape.contains(new Point(e.getX(), e.getY()));
-                if(upArrow.selected) {
-                    System.out.println("Up");
-                    capsLockHook.updatePopupDelay(true);
+        JCheckBox checkBoxAutoStartup = new JCheckBox("Startup on login");
+        JCheckBox checkBoxQuickFixToggle = new JCheckBox("Enable Quick Fix");
+        JCheckBox checkBoxMinimiseOnStart = new JCheckBox("Minimise on start");
+
+        checkBoxAutoStartup.addItemListener(e -> {
+            try {
+                String keyName = "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run";
+                String appName = "CapUp";
+
+                // Get the location of the currently running class or JAR file
+                URL location = CapsLockHook.class.getProtectionDomain().getCodeSource().getLocation();
+                String appPath = "";
+
+                if(checkBoxAutoStartup.isSelected()) {
+                    appPath = Paths.get(location.toURI())
+                                .toString()
+                                .replaceAll("app\\\\CapUp-\\d+(\\.\\d+)*\\.jar", "CapUp.exe");
+                    logger.log(Level.INFO, "Path to running executable: " + appPath, appPath);
                 }
-                downArrow.selected = downArrow.shape.contains(new Point(e.getX(), e.getY()));
-                if(downArrow.selected) {
-                    System.out.println("Down");
-                    capsLockHook.updatePopupDelay(false);
-                }
-                repaint();
-            }
-        });
 
-        addMouseMotionListener(new MouseMotionAdapter() {
-            @Override
-            public void mouseMoved(MouseEvent e) {
-                super.mouseMoved(e);
-                Arrays.stream(selectableRects).forEach(selectableRect -> {
-                    selectableRect.focused = selectableRect.shape.contains(new Point(e.getX(), e.getY()));
-                    repaint();
-                });
+                List<String> command = List.of(
+                    "reg", "add", keyName, "/v", appName, "/t", "REG_SZ", "/d", appPath, "/f"
+                );
 
-                upArrow.focused = upArrow.shape.contains(new Point(e.getX(), e.getY()));
-                downArrow.focused = downArrow.shape.contains(new Point(e.getX(), e.getY()));
-            }
-        });
+                ProcessBuilder processBuilder = new ProcessBuilder(command);
+                processBuilder.inheritIO(); // This will redirect the command output to the console
+                Process process = processBuilder.start();
 
-        setAlwaysOnTop(true);
-
-        setVisible(true);
-        offScreen = createImage(WINDOW_WIDTH, WINDOW_HEIGHT);
-        buffer = (Graphics2D) offScreen.getGraphics();
-        setVisible(false);
-    }
-
-    @Override
-    public void paint(Graphics g) {
-        if (buffer != null) {
-            buffer.setRenderingHint(
-                    RenderingHints.KEY_TEXT_ANTIALIASING,
-                    RenderingHints.VALUE_TEXT_ANTIALIAS_GASP);
-
-            buffer.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
-            buffer.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            buffer.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
-            buffer.setRenderingHint(RenderingHints.KEY_DITHERING, RenderingHints.VALUE_DITHER_ENABLE);
-            buffer.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
-            buffer.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-            buffer.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-            buffer.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
-
-            buffer.setPaint(defaultBackgroundGradient);
-            buffer.fillRect(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
-
-            Arrays.stream(selectableRects).forEach(selectableRect -> {
-                if (selectableRect.selected) {
-                    buffer.setColor(Color.WHITE);
-                    buffer.fill(selectableRect.shape);
-
-                    buffer.setColor(Color.BLACK);
-                    buffer.setFont(defaultFont);
-                    buffer.drawString("A", selectableRect.shape.getBounds().x + 10, selectableRect.shape.getBounds().y + 28);
+                int exitCode = process.waitFor();
+                if (exitCode == 0) {
+                    logger.log(Level.INFO, "Registry key updated successfully!");
+                    appConfig.updateAutoStartupEnabled(checkBoxAutoStartup.isSelected());
                 } else {
-                    if (selectableRect.focused) {
-                        buffer.setColor(Color.GRAY);
-                        buffer.fill(selectableRect.shape);
-                    }
-
-                    buffer.setColor(Color.WHITE);
-                    buffer.draw(selectableRect.shape);
+                    logger.log(Level.SEVERE, "Registry key update failed!", exitCode);
                 }
-            });
+            } catch (IOException | InterruptedException ex) {
+                logger.log(Level.SEVERE, "Coule not update registry!", ex);
+            } catch (URISyntaxException ex) {
+                logger.log(Level.SEVERE, "Coule not retrieve runtime exe path!", ex);
+            }
+        });
+        checkBoxQuickFixToggle.addItemListener(e ->
+                appConfig.updateQuickFixEnabled(checkBoxQuickFixToggle.isSelected()));
+        checkBoxMinimiseOnStart.addItemListener(e ->
+                appConfig.updateMinimiseOnStart(checkBoxMinimiseOnStart.isSelected()));
 
-            paintWhenComponentFocused(upArrow);
-            paintWhenComponentFocused(downArrow);
+        checkBoxAutoStartup.setFont(defaultFont);
+        checkBoxAutoStartup.setSelected(appConfig.getAutoStartupEnabled());
+        checkBoxMinimiseOnStart.setFont(defaultFont);
+        checkBoxMinimiseOnStart.setSelected(appConfig.getMinimiseOnStartEnabled());
+        checkBoxQuickFixToggle.setFont(defaultFont);
+        checkBoxQuickFixToggle.setSelected(appConfig.getQuickFixEnabled());
 
-            buffer.setColor(Color.GRAY);
-            buffer.setFont(propertyFont);
-            float popupDelay = Float.parseFloat(appConfig.getPopUpDelay());
-            buffer.drawString(Helpers.formatWithOneDecimalPlace(popupDelay) +"s", 60, 150);
+        panel.add(checkBoxAutoStartup);
+        panel.add(Box.createRigidArea(new Dimension(0, 0)));
+        JLabel autoStartupLabel = new JLabel("<html><span style=\"color:gray\">(Auto start this application after restarts.)</span></html>");
+        autoStartupLabel.setFont(infoFont);
+        autoStartupLabel.setPreferredSize(new Dimension(50, 50));
+        panel.add(autoStartupLabel);
 
-            g.drawImage(offScreen, 0, 0, this);
-        }
-    }
+        panel.add(checkBoxMinimiseOnStart);
+        panel.add(Box.createRigidArea(new Dimension(0, 0)));
+        JLabel minimiseOnStartupLabel = new JLabel("<html><span style=\"color:gray\">(Minimise to system tray on launch.)</span></html>");
+        minimiseOnStartupLabel.setFont(infoFont);
+        minimiseOnStartupLabel.setPreferredSize(new Dimension(50, 50));
+        panel.add(minimiseOnStartupLabel);
 
-    private void paintWhenComponentFocused(UIComponent component) {
-        if(component.focused) {
-            buffer.setColor(Color.GRAY);
-            buffer.fill(component.shape);
-        }
-        buffer.setColor(Color.WHITE);
-        buffer.draw(component.shape);
+        panel.add(checkBoxQuickFixToggle);
+        panel.add(Box.createRigidArea(new Dimension(20, 0)));
+        JLabel quickFixLabel = new JLabel("<html><span style=\"color:gray\">(Use Quick Fix with <span style=\"font-weight:500\">`Left-Control + Q`</span> to convert highlighted uppercase text to lowercase.)</span></html>\n");
+        quickFixLabel.setFont(infoFont);
+        quickFixLabel.setPreferredSize(new Dimension(50, 50));
+        panel.add(quickFixLabel);
+
+        panel.add(Box.createRigidArea(new Dimension(0, 10)));
+        JButton infoButton = new JButton("Show Extra Info");
+        infoButton.setFont(defaultFont);
+        infoButton.setPreferredSize(new Dimension(50, 50));
+
+        infoButton.addActionListener(e -> {
+            if(infoView != null) {
+                infoView.showInfo();
+            }
+        });
+
+        panel.add(infoButton);
+
+        add(panel);
+
+        boolean shouldMinimiseOnStartOnlyIfNotFirstTimeUser =
+                !appConfig.getMinimiseOnStartEnabled() && !appConfig.isFirstTimeUser();
+        setVisible(shouldMinimiseOnStartOnlyIfNotFirstTimeUser);
     }
 
     public void showSettings() {
         setVisible(true);
+    }
+
+    public void setInfoView(InfoView infoView) {
+        this.infoView = infoView;
     }
 }
