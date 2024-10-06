@@ -137,7 +137,7 @@ public class CapsLockHook extends JFrame implements NativeKeyListener {
             exitItem.addActionListener(e -> System.exit(0));
             popupMenu.add(exitItem);
 
-            TrayIcon trayIcon = new TrayIcon(image, "Cap Lock Hook", popupMenu);
+            TrayIcon trayIcon = new TrayIcon(image, "CapUp", popupMenu);
 
             try {
                 tray.add(trayIcon);
