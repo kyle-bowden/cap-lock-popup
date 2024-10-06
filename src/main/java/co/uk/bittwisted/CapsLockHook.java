@@ -51,7 +51,6 @@ public class CapsLockHook extends JFrame implements NativeKeyListener {
     private final String appDataFolderPath = System.getenv("APPDATA") + "\\cap-lock-hook";
 
     private final GradientPaint defaultBackgroundGradient;
-    private final AnalyticService analyticService;
 
     public CapsLockHook() throws AWTException {
         setTitle("CapUp");
@@ -67,7 +66,6 @@ public class CapsLockHook extends JFrame implements NativeKeyListener {
 
         robot = new Robot();
         appConfig = new AppConfig(appDataFolderPath);
-        analyticService = new AnalyticService(appConfig.getClientId());
         defaultBackgroundGradient = new GradientPaint(100, 0, Color.BLACK, getWidth()+50, getHeight(), Color.GRAY);
 
         GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
@@ -221,7 +219,6 @@ public class CapsLockHook extends JFrame implements NativeKeyListener {
 
         repaint();
 
-        analyticService.trackCapLockFlipToggle();
         logger.log(Level.INFO, "Reset caps lock");
     }
 
@@ -289,8 +286,6 @@ public class CapsLockHook extends JFrame implements NativeKeyListener {
             hidePopup();
         }
         repaint();
-
-        analyticService.trackCapLockToggle();
     }
 
     private void showSuccessStatusPopup() {
@@ -339,8 +334,6 @@ public class CapsLockHook extends JFrame implements NativeKeyListener {
 
             showSuccessStatusPopup();
         }
-
-        analyticService.trackCapLockQuickFix();
     }
 
     private void hidePopup() {
