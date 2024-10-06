@@ -29,7 +29,6 @@ public class InfoView extends JDialog {
         setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
         setDefaultLookAndFeelDecorated(false);
-        getContentPane().setBackground(Color.WHITE);
         setLocation(settingsView.getX(), settingsView.getY() + settingsView.getHeight());
 
         setLayout(new GridLayout(1,1));
@@ -70,16 +69,14 @@ public class InfoView extends JDialog {
         panel.add(appInfoPanel);
         panel.add(Box.createRigidArea(new Dimension(0, 10)));
 
-
-
         JPanel warningInfoPanel = new JPanel();
         warningInfoPanel.setLayout(new BoxLayout(warningInfoPanel, BoxLayout.X_AXIS));
         warningInfoPanel.setBorder(BorderFactory.createEmptyBorder(0, 25, 10, 10));
 
         JLabel warningInfoLabel = new JLabel(
-                "<html><span style=\"color:red\">The popup may show the wrong Caps Lock state if another program goes " +
+                "<html><span style=\"color:rgb(230, 26, 11)\">The popup may show the wrong Caps Lock state if another program goes " +
                         "fullscreen (e.g., a game). Right-click the system tray icon and select " +
-                        "<span style=\"color:black\">'Flip Caps Lock'</span> to fix it.</span></html>",
+                        "<span style=\"color:rgb(187, 187, 187)\">'Flip Caps Lock'</span> to fix it.</span></html>",
                 SwingConstants.CENTER);
         warningInfoLabel.setFont(warningFont);
         warningInfoPanel.add(warningInfoLabel);
@@ -87,14 +84,11 @@ public class InfoView extends JDialog {
         panel.add(warningInfoPanel);
         panel.add(Box.createRigidArea(new Dimension(0, 20)));
 
-
-
-
         JPanel devInfoPanel = new JPanel();
         devInfoPanel.setLayout(new BoxLayout(devInfoPanel, BoxLayout.X_AXIS));
 
         JLabel devInfoLabel = new JLabel(
-                "<html><span style=\"color: gray\">- Developed By <a href=\"\">Kyle Bowden</a> -</span></html>",
+                "<html><span style=\"color:rgb(187, 187, 187)\">- Developed By <a href=\"\">Kyle Bowden</a> -</span></html>",
                 SwingConstants.CENTER);
         devInfoLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
         devInfoLabel.setFont(createdByFont);

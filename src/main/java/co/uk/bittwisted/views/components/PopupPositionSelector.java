@@ -22,13 +22,20 @@ public class PopupPositionSelector extends JComponent {
 
     private Graphics2D buffer;
 
+    private final Color selectedColor = new Color(187, 187, 187);
+    private final Color focusColor = new Color(62, 101, 145);
     private final SelectableUpTriangle upArrow = new SelectableUpTriangle(205, 100);
     private final SelectableDownTriangle downArrow = new SelectableDownTriangle(205, 140);
 
     public final Font defaultFont = new Font("Arial Black", Font.PLAIN, 25);
     public final Font propertyFont = new Font("Arial Black", Font.PLAIN, 50);
     private final GradientPaint defaultBackgroundGradient =
-            new GradientPaint(0, COMPONENT_HEIGHT / 2, Color.BLACK, COMPONENT_WIDTH, COMPONENT_HEIGHT / 2, Color.GRAY);
+            new GradientPaint(0,
+                    COMPONENT_HEIGHT / 2,
+                    new Color(60, 63, 65),
+                    COMPONENT_WIDTH,
+                    COMPONENT_HEIGHT / 2,
+                    new Color(78, 80, 82));
 
     public PopupPositionSelector(CapsLockHook clh, AppConfig appConfig) {
         this.appConfig = appConfig;
@@ -120,7 +127,7 @@ public class PopupPositionSelector extends JComponent {
 
             Arrays.stream(selectablePositionRects).forEach(selectableRect -> {
                 if (selectableRect.selected) {
-                    buffer.setColor(Color.WHITE);
+                    buffer.setColor(selectedColor);
                     buffer.fill(selectableRect.shape);
 
                     buffer.setColor(Color.BLACK);
@@ -128,7 +135,7 @@ public class PopupPositionSelector extends JComponent {
                     buffer.drawString("A", selectableRect.shape.getBounds().x + 10, selectableRect.shape.getBounds().y + 28);
                 } else {
                     if (selectableRect.focused) {
-                        buffer.setColor(Color.GRAY);
+                        buffer.setColor(focusColor);
                         buffer.fill(selectableRect.shape);
                     }
 
@@ -140,7 +147,7 @@ public class PopupPositionSelector extends JComponent {
             paintWhenComponentFocused(upArrow);
             paintWhenComponentFocused(downArrow);
 
-            buffer.setColor(Color.GRAY);
+            buffer.setColor(selectedColor);
             buffer.setFont(propertyFont);
             float popupDelay = Float.parseFloat(appConfig.getPopUpDelay());
             buffer.drawString(Helpers.formatWithOneDecimalPlace(popupDelay) +"s", 60, 150);
