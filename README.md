@@ -1,4 +1,4 @@
-# CapLockHook
+# CapUp
 
 A simple Windows GUI application to display what state the cap lock key is in.
 
