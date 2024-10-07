@@ -29,7 +29,7 @@ public class SettingsView extends JFrame {
     public SettingsView(CapsLockHook clh, AppConfig config) {
         this.appConfig = config;
 
-        setTitle("CapUp v1.1.0");
+        setTitle(appConfig.getAppNameWithVersion());
         setResizable(false);
         setAlwaysOnTop(true);
         setType(Type.UTILITY);
@@ -54,7 +54,6 @@ public class SettingsView extends JFrame {
         checkBoxAutoStartup.addItemListener(e -> {
             try {
                 String keyName = "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run";
-                String appName = "CapUp";
 
                 // Get the location of the currently running class or JAR file
                 URL location = CapsLockHook.class.getProtectionDomain().getCodeSource().getLocation();
@@ -63,12 +62,12 @@ public class SettingsView extends JFrame {
                 if(checkBoxAutoStartup.isSelected()) {
                     appPath = Paths.get(location.toURI())
                                 .toString()
-                                .replaceAll("app\\\\CapUp-\\d+(\\.\\d+)*\\.jar", "CapUp.exe");
+                                .replaceAll("app\\\\" + appConfig.getAppName() + "-\\d+(\\.\\d+)*\\.jar", appConfig.getAppName() + ".exe");
                     logger.log(Level.INFO, "Path to running executable: " + appPath, appPath);
                 }
 
                 List<String> command = List.of(
-                    "reg", "add", keyName, "/v", appName, "/t", "REG_SZ", "/d", appPath, "/f"
+                    "reg", "add", keyName, "/v", appConfig.getAppName(), "/t", "REG_SZ", "/d", appPath, "/f"
                 );
 
                 ProcessBuilder processBuilder = new ProcessBuilder(command);

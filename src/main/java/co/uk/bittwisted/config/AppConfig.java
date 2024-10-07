@@ -17,6 +17,7 @@ public class AppConfig {
 
     private final File configFile;
     private final Properties properties;
+    private final VersionReader versionReader;
 
     public static final String PROPERTY_LOCATION                    = "location";
     public static final String PROPERTY_CLIENT_ID                   = "clientId";
@@ -34,6 +35,8 @@ public class AppConfig {
     public static Boolean DEFAULT_MINIMISE_ON_START_ENABLED = Boolean.TRUE;
 
     public AppConfig(String appDataFolderPath) {
+        this.versionReader = new VersionReader();
+
         File settingsDir = new File(appDataFolderPath);
         if(!settingsDir.exists()) {
             boolean success = settingsDir.mkdir();
@@ -121,6 +124,18 @@ public class AppConfig {
 
     public String getClientId() {
         return properties.getProperty(PROPERTY_CLIENT_ID);
+    }
+
+    public String getAppName() {
+        return versionReader.getAppName();
+    }
+
+    public String getAppVersion() {
+        return "v" + versionReader.getAppVersion();
+    }
+
+    public String getAppNameWithVersion() {
+        return getAppName() + " " + getAppVersion();
     }
 
     public String getPopUpDelay() {

@@ -32,7 +32,6 @@ public class CapsLockHook extends JFrame implements NativeKeyListener {
     private final Robot robot;
     private final Font defaultFont = new Font("Arial Black", Font.PLAIN, 50);
     private final Logger logger = Logger.getLogger(CapsLockHook.class.getName());
-    private final InfoView infoView;
     private final SettingsView settingsView;
     private boolean capsLockOn;
     private boolean isSuccessPopup;
@@ -52,7 +51,9 @@ public class CapsLockHook extends JFrame implements NativeKeyListener {
     private final GradientPaint defaultBackgroundGradient;
 
     public CapsLockHook() throws AWTException {
-        setTitle("CapUp");
+        appConfig = new AppConfig(appDataFolderPath);
+
+        setTitle(appConfig.getAppName());
         setType(Type.UTILITY);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(100, 100);
@@ -60,11 +61,9 @@ public class CapsLockHook extends JFrame implements NativeKeyListener {
         setUndecorated(true);
         setAlwaysOnTop(true);
         setFocusableWindowState(false);
-
         setShape(new RoundRectangle2D.Double(0, 0, getWidth(), getHeight(), 30, 30));
 
         robot = new Robot();
-        appConfig = new AppConfig(appDataFolderPath);
         defaultBackgroundGradient = new GradientPaint(
                 100,
                 0,
@@ -99,7 +98,7 @@ public class CapsLockHook extends JFrame implements NativeKeyListener {
         Runtime.getRuntime().addShutdownHook(new Thread(this::stopCapsLockHook));
 
         settingsView = new SettingsView(this, appConfig);
-        infoView = new InfoView(settingsView);
+        InfoView infoView = new InfoView(settingsView, appConfig);
         settingsView.setInfoView(infoView);
         if(appConfig.isFirstTimeUser())  {
             settingsView.showSettings();
@@ -137,7 +136,7 @@ public class CapsLockHook extends JFrame implements NativeKeyListener {
             exitItem.addActionListener(e -> System.exit(0));
             popupMenu.add(exitItem);
 
-            TrayIcon trayIcon = new TrayIcon(image, "CapUp", popupMenu);
+            TrayIcon trayIcon = new TrayIcon(image, appConfig.getAppName(), popupMenu);
 
             try {
                 tray.add(trayIcon);
