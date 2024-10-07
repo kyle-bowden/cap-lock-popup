@@ -17,8 +17,6 @@ import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.awt.geom.Path2D;
 import java.awt.geom.RoundRectangle2D;
 import java.util.Objects;
@@ -88,12 +86,6 @@ public class CapsLockHook extends JFrame implements NativeKeyListener {
         Toolkit kit = Toolkit.getDefaultToolkit();
         capsLockOn = kit.getLockingKeyState(KeyEvent.VK_CAPS_LOCK);
 
-        addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                flipCapLockState();
-            }
-        });
         setupSystemTray();
         Runtime.getRuntime().addShutdownHook(new Thread(this::stopCapsLockHook));
 
