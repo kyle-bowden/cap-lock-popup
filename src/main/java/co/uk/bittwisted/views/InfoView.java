@@ -1,5 +1,7 @@
 package co.uk.bittwisted.views;
 
+import co.uk.bittwisted.config.AppConfig;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -22,7 +24,7 @@ public class InfoView extends JDialog {
     public final Font warningFont = new Font("Arial", Font.BOLD | Font.ITALIC, 20);
     public final Font titleFont = new Font("Arial", Font.BOLD, 32);
 
-    public InfoView(SettingsView settingsView) {
+    public InfoView(SettingsView settingsView, AppConfig appConfig) {
         super(settingsView, "Info", true);
 
         setResizable(false);
@@ -46,7 +48,7 @@ public class InfoView extends JDialog {
         Image resizedImage = originalImage.getScaledInstance(60, 60, Image.SCALE_SMOOTH);
         ImageIcon resizedIcon = new ImageIcon(resizedImage);
         JLabel iconLabel = new JLabel(resizedIcon);
-        JLabel titleLabel = new JLabel("CapUp v1.1.0");
+        JLabel titleLabel = new JLabel(appConfig.getAppNameWithVersion());
         titleLabel.setFont(titleFont);
 
         titlePanel.add(iconLabel);
