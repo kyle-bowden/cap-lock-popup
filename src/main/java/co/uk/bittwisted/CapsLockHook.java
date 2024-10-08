@@ -24,6 +24,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static java.lang.Thread.sleep;
+import static javax.swing.SwingUtilities.*;
 
 public class CapsLockHook extends JFrame implements NativeKeyListener {
     private Timer timer;
@@ -346,8 +347,20 @@ public class CapsLockHook extends JFrame implements NativeKeyListener {
         timer.start();
     }
 
+    private void maybeRectifyFalseCapLockState(NativeKeyEvent e) {
+        boolean checkCapsLockOn = Character.isUpperCase(e.getKeyChar());
+        if(e.getModifiers() != NativeInputEvent.SHIFT_L_MASK && checkCapsLockOn != capsLockOn) {
+            capsLockOn = checkCapsLockOn;
+            logger.info("Rectify caps lock state: " + checkCapsLockOn);
+        } else
+        if (e.getModifiers() == NativeInputEvent.SHIFT_L_MASK && checkCapsLockOn == capsLockOn) {
+            capsLockOn = !checkCapsLockOn;
+            logger.info("Rectify caps lock state: " + checkCapsLockOn);
+        }
+    }
+
     public static void main(String[] args) {
-        javax.swing.SwingUtilities.invokeLater(() -> {
+        invokeLater(() -> {
             try {
                 UIManager.setLookAndFeel( new FlatDarkLaf() );
                 CapsLockHook frame = new CapsLockHook();
@@ -376,17 +389,5 @@ public class CapsLockHook extends JFrame implements NativeKeyListener {
 
     public void nativeKeyTyped(NativeKeyEvent e) {
         maybeRectifyFalseCapLockState(e);
-    }
-
-    private void maybeRectifyFalseCapLockState(NativeKeyEvent e) {
-        boolean checkCapsLockOn = Character.isUpperCase(e.getKeyChar());
-        if(e.getModifiers() != NativeInputEvent.SHIFT_L_MASK && checkCapsLockOn != capsLockOn) {
-            capsLockOn = checkCapsLockOn;
-            logger.info("Rectify caps lock state: " + checkCapsLockOn);
-        } else
-        if (e.getModifiers() == NativeInputEvent.SHIFT_L_MASK && checkCapsLockOn == capsLockOn) {
-            capsLockOn = !checkCapsLockOn;
-            logger.info("Rectify caps lock state: " + checkCapsLockOn);
-        }
     }
 }
