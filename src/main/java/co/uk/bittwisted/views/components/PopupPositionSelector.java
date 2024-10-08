@@ -68,7 +68,7 @@ public class PopupPositionSelector extends JComponent {
                     if(selectableRect.shape.contains(new Point(e.getX(), e.getY()))) {
                         Arrays.stream(selectablePositionRects).forEach(selectableRoundRect -> selectableRoundRect.selected = false);
                         selectableRect.selected = true;
-                        clh.updatePopupPosition(selectableRect.position);
+                        clh.setPopupPosition(selectableRect.position);
                     }
                     repaint();
                 });

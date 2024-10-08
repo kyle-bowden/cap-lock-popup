@@ -24,6 +24,8 @@ public class InfoView extends JDialog {
     public final Font warningFont = new Font("Arial", Font.BOLD | Font.ITALIC, 20);
     public final Font titleFont = new Font("Arial", Font.BOLD, 32);
 
+    private static final String developerLink = "https://github.com/kyle-bowden/cap-lock-popup";
+
     public InfoView(SettingsView settingsView, AppConfig appConfig) {
         super(settingsView, "Info", true);
 
@@ -98,7 +100,7 @@ public class InfoView extends JDialog {
             @Override
             public void mouseClicked(MouseEvent e) {
                 try {
-                    Desktop.getDesktop().browse(new URI("https://www.linkedin.com/in/kyle-bowden-761b366b/"));
+                    Desktop.getDesktop().browse(new URI(developerLink));
                 } catch (URISyntaxException | IOException ex) {
                     logger.log(Level.WARNING, "Unable to open link!");
                 }

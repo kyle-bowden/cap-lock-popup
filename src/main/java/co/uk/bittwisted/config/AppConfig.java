@@ -1,5 +1,6 @@
 package co.uk.bittwisted.config;
 
+import co.uk.bittwisted.enums.PopupSize;
 import co.uk.bittwisted.enums.Position;
 import co.uk.bittwisted.util.Helpers;
 
@@ -21,6 +22,7 @@ public class AppConfig {
 
     public static final String PROPERTY_LOCATION                    = "location";
     public static final String PROPERTY_CLIENT_ID                   = "clientId";
+    public static final String PROPERTY_POPUP_SIZE                  = "medium";
     public static final String PROPERTY_POPUP_DELAY                 = "popupDelay";
     public static final String PROPERTY_QUICK_FIX_ENABLED           = "quickFixEnabled";
     public static final String PROPERTY_AUTO_STARTUP_ENABLED        = "autoStartupEnabled";
@@ -54,6 +56,7 @@ public class AppConfig {
         if(!configFile.exists()) {
             updateClientId(UUID.randomUUID().toString());
             updateLocation(DEFAULT_POSITION);
+            updatePopUpSize(PopupSize.MEDIUM);
             updatePopUpDelay(DEFAULT_POPUP_DELAY);
             updateQuickFixEnabled(DEFAULT_QUICK_FIX_ENABLED);
             updateAutoStartupEnabled(DEFAULT_AUTO_STARTUP_ENABLED);
@@ -108,6 +111,11 @@ public class AppConfig {
         persistConfig();
     }
 
+    public void updatePopUpSize(PopupSize popupSize) {
+        properties.setProperty(PROPERTY_POPUP_SIZE, popupSize.name());
+        persistConfig();
+    }
+
     private void keepClientIDAcrossNewConfigVersions() {
         if(properties.getProperty(PROPERTY_CLIENT_ID) == null) {
             properties.setProperty(PROPERTY_CLIENT_ID, UUID.randomUUID().toString());
@@ -140,6 +148,10 @@ public class AppConfig {
 
     public String getPopUpDelay() {
         return properties.getProperty(PROPERTY_POPUP_DELAY);
+    }
+
+    public String getPopUpSize() {
+        return properties.getProperty(PROPERTY_POPUP_SIZE);
     }
 
     public Boolean getQuickFixEnabled() {

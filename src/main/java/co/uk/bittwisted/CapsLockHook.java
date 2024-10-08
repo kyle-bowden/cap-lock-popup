@@ -1,6 +1,7 @@
 package co.uk.bittwisted;
 
 import co.uk.bittwisted.config.AppConfig;
+import co.uk.bittwisted.enums.PopupSize;
 import co.uk.bittwisted.enums.Position;
 import co.uk.bittwisted.util.Helpers;
 import co.uk.bittwisted.views.InfoView;
@@ -24,17 +25,19 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static java.lang.Thread.sleep;
-import static javax.swing.SwingUtilities.*;
+import static javax.swing.SwingUtilities.invokeLater;
 
 public class CapsLockHook extends JFrame implements NativeKeyListener {
     private Timer timer;
     private final Robot robot;
-    private final Font defaultFont = new Font("Arial Black", Font.PLAIN, 50);
     private final Logger logger = Logger.getLogger(CapsLockHook.class.getName());
     private final SettingsView settingsView;
     private boolean capsLockOn;
     private boolean isSuccessPopup;
     private boolean RESET_IN_ACTION = false;
+
+    private final AppConfig appConfig;
+    private final String appDataFolderPath = System.getenv("APPDATA") + "\\cap-up";
 
     private final Point topLeft;
     private final Point topRight;
@@ -43,19 +46,34 @@ public class CapsLockHook extends JFrame implements NativeKeyListener {
     private final Point bottomRight;
     private final Point bottomCenter;
 
-    private final AppConfig appConfig;
-    private final String appDataFolderPath = System.getenv("APPDATA") + "\\cap-lock-hook";
-
     private final Color borderColor = new Color(187, 187, 187);
     private final GradientPaint defaultBackgroundGradient;
+
+    private final Font smallFont = new Font("Arial Black", Font.PLAIN, 30);
+    private final int APP_WIDTH_SMALL  = 75;
+    private final int APP_HEIGHT_SMALL = 75;
+
+    private final Font mediumFont = new Font("Arial Black", Font.PLAIN, 50);
+    private final int APP_WIDTH_MEDIUM  = 100;
+    private final int APP_HEIGHT_MEDIUM = 100;
+
+    private final Font largeFont = new Font("Arial Black", Font.PLAIN, 70);
+    private final int APP_WIDTH_LARGE  = 125;
+    private final int APP_HEIGHT_LARGE = 125;
+
+    private Font sizeFont     = mediumFont;
+    private int APP_WIDTH     = APP_WIDTH_MEDIUM;
+    private int APP_HEIGHT    = APP_HEIGHT_MEDIUM;
 
     public CapsLockHook() throws AWTException {
         appConfig = new AppConfig(appDataFolderPath);
 
+        setPopUpSize(PopupSize.valueOf(appConfig.getPopUpSize()));
+
         setTitle(appConfig.getAppName());
         setType(Type.UTILITY);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(100, 100);
+        setSize(APP_WIDTH, APP_HEIGHT);
         setLocationRelativeTo(null);
         setUndecorated(true);
         setAlwaysOnTop(true);
@@ -102,7 +120,7 @@ public class CapsLockHook extends JFrame implements NativeKeyListener {
             infoView.showInfo();
         }
 
-        updatePopupPosition(Position.valueOf(appConfig.getLocation()));
+        setPopupPosition(Position.valueOf(appConfig.getLocation()));
     }
 
     private void setupSystemTray() {
@@ -174,10 +192,10 @@ public class CapsLockHook extends JFrame implements NativeKeyListener {
 
         g2d.setRenderingHint(
                 RenderingHints.KEY_TEXT_ANTIALIASING,
-                RenderingHints.VALUE_TEXT_ANTIALIAS_GASP);
+                RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
         g2d.setPaint(defaultBackgroundGradient);
-        g2d.fillRect(0, 0, 100, 100);
+        g2d.fillRect(0, 0, APP_WIDTH, APP_HEIGHT);
 
         if(!isSuccessPopup) {
             if(RESET_IN_ACTION) {
@@ -185,8 +203,14 @@ public class CapsLockHook extends JFrame implements NativeKeyListener {
             } else {
                 g2d.setColor(borderColor);
             }
-            g2d.setFont(defaultFont);
-            g2d.drawString(message, 32, 65);
+            g2d.setFont(sizeFont);
+
+            FontMetrics fm = g2d.getFontMetrics();
+            int stringWidth = fm.stringWidth(message);
+            int stringHeight = fm.getAscent() + fm.getDescent();
+            int textX = (getWidth() - stringWidth) / 2;
+            int textY = (getHeight() - stringHeight) / 2 + fm.getAscent();
+            g2d.drawString(message, textX, textY);
         } else {
             // Define the path of the check mark
             Path2D check = new Path2D.Double();
@@ -242,7 +266,28 @@ public class CapsLockHook extends JFrame implements NativeKeyListener {
         }
     }
 
-    public void updatePopupPosition(Position position) {
+    private void setPopUpSize(PopupSize popupSize) {
+        logger.log(Level.INFO, "POPUP SIZE:" + popupSize);
+        switch (popupSize) {
+            case SMALL -> {
+                sizeFont   = smallFont;
+                APP_WIDTH  = APP_WIDTH_SMALL;
+                APP_HEIGHT = APP_HEIGHT_SMALL;
+            }
+            case MEDIUM -> {
+                sizeFont   = mediumFont;
+                APP_WIDTH  = APP_WIDTH_MEDIUM;
+                APP_HEIGHT = APP_HEIGHT_MEDIUM;
+            }
+            case LARGE -> {
+                sizeFont   = largeFont;
+                APP_WIDTH  = APP_WIDTH_LARGE;
+                APP_HEIGHT = APP_HEIGHT_LARGE;
+            }
+        }
+    }
+
+    public void setPopupPosition(Position position) {
         logger.log(Level.INFO, "POSITION:" + position);
         switch (position) {
             case TOP_LEFT: setLocation(topLeft); break;
