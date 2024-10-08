@@ -380,7 +380,7 @@ public class CapsLockHook extends JFrame implements NativeKeyListener {
 
     private void maybeRectifyFalseCapLockState(NativeKeyEvent e) {
         boolean checkCapsLockOn = Character.isUpperCase(e.getKeyChar());
-        if(e.getModifiers() != 1 && checkCapsLockOn != capsLockOn) {
+        if(e.getModifiers() != NativeInputEvent.SHIFT_L_MASK && checkCapsLockOn != capsLockOn) {
             capsLockOn = checkCapsLockOn;
             logger.info("Rectify caps lock state: " + checkCapsLockOn);
         } else
