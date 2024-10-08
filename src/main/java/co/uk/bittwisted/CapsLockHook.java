@@ -61,6 +61,10 @@ public class CapsLockHook extends JFrame implements NativeKeyListener {
         setFocusableWindowState(false);
         setShape(new RoundRectangle2D.Double(0, 0, getWidth(), getHeight(), 30, 30));
 
+        // Get the logger for "org.jnativehook" and set the level to off.
+        Logger logger = Logger.getLogger(GlobalScreen.class.getPackage().getName());
+        logger.setLevel(Level.OFF);
+
         robot = new Robot();
         defaultBackgroundGradient = new GradientPaint(
                 100,
@@ -371,9 +375,17 @@ public class CapsLockHook extends JFrame implements NativeKeyListener {
     public void nativeKeyReleased(NativeKeyEvent e) {}
 
     public void nativeKeyTyped(NativeKeyEvent e) {
+        maybeRectifyFalseCapLockState(e);
+    }
+
+    private void maybeRectifyFalseCapLockState(NativeKeyEvent e) {
         boolean checkCapsLockOn = Character.isUpperCase(e.getKeyChar());
-        if(checkCapsLockOn != capsLockOn) {
+        if(e.getModifiers() != 1 && checkCapsLockOn != capsLockOn) {
             capsLockOn = checkCapsLockOn;
+            logger.info("Rectify caps lock state: " + checkCapsLockOn);
+        } else
+        if (e.getModifiers() == NativeInputEvent.SHIFT_L_MASK && checkCapsLockOn == capsLockOn) {
+            capsLockOn = !checkCapsLockOn;
             logger.info("Rectify caps lock state: " + checkCapsLockOn);
         }
     }
