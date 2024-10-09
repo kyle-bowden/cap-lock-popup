@@ -73,7 +73,7 @@
                     <type>MSI</type> <!-- The output type (exe for Windows) -->
                     <runtimeImage>${java.home}</runtimeImage> <!-- Optional: Custom JRE, use if needed -->
                     <copyright>Kyle Bowden</copyright>
-                    <description>Simple popup for cap locks key</description>
+                    <description>Simple popup for the cap lock key.</description>
                     <vendor>Kyle Bowden</vendor>
                     <winDirChooser>true</winDirChooser>
                     <winMenu>true</winMenu>
