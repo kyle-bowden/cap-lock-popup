@@ -56,7 +56,7 @@ public class AppConfig {
 
         if(!configFile.exists()) {
             updateClientId(UUID.randomUUID().toString());
-            updateLocation(DEFAULT_POSITION);
+            updatePosition(DEFAULT_POSITION);
             updatePopUpSize(DEFAULT_POPUP_SIZE);
             updatePopUpDelay(DEFAULT_POPUP_DELAY);
             updateQuickFixEnabled(DEFAULT_QUICK_FIX_ENABLED);
@@ -82,7 +82,7 @@ public class AppConfig {
         }
     }
 
-    public void updateLocation(Position location) {
+    public void updatePosition(Position location) {
         properties.setProperty(PROPERTY_LOCATION, location.name());
         persistConfig();
     }
@@ -127,7 +127,7 @@ public class AppConfig {
         return isFirstTimeUser;
     }
 
-    public String getLocation() {
+    public String getPosition() {
         return properties.getProperty(PROPERTY_LOCATION);
     }
 

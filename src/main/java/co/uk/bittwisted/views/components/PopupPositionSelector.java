@@ -48,7 +48,7 @@ public class PopupPositionSelector extends JComponent {
         this.appConfig = appConfig;
 
         setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
-        Position position = Position.valueOf(appConfig.getLocation());
+        Position position = Position.valueOf(appConfig.getPosition());
 
         //35
         int TOP_PADDING = 20;
@@ -67,7 +67,7 @@ public class PopupPositionSelector extends JComponent {
             public void mouseClicked(MouseEvent e) {
                 Arrays.stream(selectablePositionRects).forEach(selectableRect -> {
                     if(selectableRect.selected &&
-                        selectableRect.position == Position.valueOf(appConfig.getLocation()))  {
+                        selectableRect.position == Position.valueOf(appConfig.getPosition()))  {
                         return;
                     }
 
@@ -92,19 +92,19 @@ public class PopupPositionSelector extends JComponent {
                 smallCircle.selected = smallCircle.shape.contains(new Point(e.getX(), e.getY()));
                 if(smallCircle.selected) {
                     clh.setPopUpSize(PopupSize.SMALL);
-                    clh.setPopupPosition(Position.valueOf(appConfig.getLocation()));
+                    clh.setPopupPosition(Position.valueOf(appConfig.getPosition()));
                 }
 
                 mediumCircle.selected = mediumCircle.shape.contains(new Point(e.getX(), e.getY()));
                 if(mediumCircle.selected) {
                     clh.setPopUpSize(PopupSize.MEDIUM);
-                    clh.setPopupPosition(Position.valueOf(appConfig.getLocation()));
+                    clh.setPopupPosition(Position.valueOf(appConfig.getPosition()));
                 }
 
                 largeCircle.selected = largeCircle.shape.contains(new Point(e.getX(), e.getY()));
                 if(largeCircle.selected) {
                     clh.setPopUpSize(PopupSize.LARGE);
-                    clh.setPopupPosition(Position.valueOf(appConfig.getLocation()));
+                    clh.setPopupPosition(Position.valueOf(appConfig.getPosition()));
                 }
 
                 setSelectedSize();
