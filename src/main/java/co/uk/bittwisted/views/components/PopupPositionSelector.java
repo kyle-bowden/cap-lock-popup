@@ -2,6 +2,7 @@ package co.uk.bittwisted.views.components;
 
 import co.uk.bittwisted.CapsLockHook;
 import co.uk.bittwisted.config.AppConfig;
+import co.uk.bittwisted.enums.PopupSize;
 import co.uk.bittwisted.enums.Position;
 import co.uk.bittwisted.util.Helpers;
 
@@ -12,9 +13,11 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.util.Arrays;
+import java.util.logging.Logger;
 
 public class PopupPositionSelector extends JComponent {
     private final AppConfig appConfig;
+    private final Logger logger = Logger.getLogger(PopupPositionSelector.class.getName());
 
     private final int COMPONENT_WIDTH = 250;
     private final int COMPONENT_HEIGHT = 250;
@@ -24,11 +27,15 @@ public class PopupPositionSelector extends JComponent {
 
     private final Color selectedColor = new Color(187, 187, 187);
     private final Color focusColor = new Color(62, 101, 145);
-    private final SelectableUpTriangle upArrow = new SelectableUpTriangle(205, 100);
-    private final SelectableDownTriangle downArrow = new SelectableDownTriangle(205, 140);
+    private final SelectableUpTriangle upArrow = new SelectableUpTriangle(205, 110);
+    private final SelectableDownTriangle downArrow = new SelectableDownTriangle(205, 150);
 
-    public final Font defaultFont = new Font("Arial Black", Font.PLAIN, 25);
-    public final Font propertyFont = new Font("Arial Black", Font.PLAIN, 50);
+    private final SelectableCircle smallCircle = new SelectableCircle(70, 81, 20, 20);
+    private final SelectableCircle mediumCircle = new SelectableCircle(112, 78, 25, 25);
+    private final SelectableCircle largeCircle = new SelectableCircle(157, 75, 30, 30);
+
+    public final Font defaultFont       = new Font("Arial Black", Font.PLAIN, 25);
+    public final Font popupDelayFont    = new Font("Arial Black", Font.PLAIN, 50);
     private final GradientPaint defaultBackgroundGradient =
             new GradientPaint(0,
                     COMPONENT_HEIGHT / 2,
@@ -41,8 +48,7 @@ public class PopupPositionSelector extends JComponent {
         this.appConfig = appConfig;
 
         setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
-
-        Position position = Position.valueOf(appConfig.getLocation());
+        Position position = Position.valueOf(appConfig.getPosition());
 
         //35
         int TOP_PADDING = 20;
@@ -61,27 +67,47 @@ public class PopupPositionSelector extends JComponent {
             public void mouseClicked(MouseEvent e) {
                 Arrays.stream(selectablePositionRects).forEach(selectableRect -> {
                     if(selectableRect.selected &&
-                            selectableRect.position == Position.valueOf(appConfig.getLocation()))  {
+                        selectableRect.position == Position.valueOf(appConfig.getPosition()))  {
                         return;
                     }
 
                     if(selectableRect.shape.contains(new Point(e.getX(), e.getY()))) {
                         Arrays.stream(selectablePositionRects).forEach(selectableRoundRect -> selectableRoundRect.selected = false);
                         selectableRect.selected = true;
-                        clh.updatePopupPosition(selectableRect.position);
+                        clh.setPopupPosition(selectableRect.position);
                     }
+
                     repaint();
                 });
 
                 upArrow.selected = upArrow.shape.contains(new Point(e.getX(), e.getY()));
                 if(upArrow.selected) {
-                    clh.updatePopupDelay(true);
+                    clh.setPopupDelay(true);
                 }
                 downArrow.selected = downArrow.shape.contains(new Point(e.getX(), e.getY()));
                 if(downArrow.selected) {
-                    clh.updatePopupDelay(false);
+                    clh.setPopupDelay(false);
                 }
 
+                smallCircle.selected = smallCircle.shape.contains(new Point(e.getX(), e.getY()));
+                if(smallCircle.selected) {
+                    clh.setPopUpSize(PopupSize.SMALL);
+                    clh.setPopupPosition(Position.valueOf(appConfig.getPosition()));
+                }
+
+                mediumCircle.selected = mediumCircle.shape.contains(new Point(e.getX(), e.getY()));
+                if(mediumCircle.selected) {
+                    clh.setPopUpSize(PopupSize.MEDIUM);
+                    clh.setPopupPosition(Position.valueOf(appConfig.getPosition()));
+                }
+
+                largeCircle.selected = largeCircle.shape.contains(new Point(e.getX(), e.getY()));
+                if(largeCircle.selected) {
+                    clh.setPopUpSize(PopupSize.LARGE);
+                    clh.setPopupPosition(Position.valueOf(appConfig.getPosition()));
+                }
+
+                setSelectedSize();
                 repaint();
             }
         });
@@ -97,8 +123,26 @@ public class PopupPositionSelector extends JComponent {
 
                 upArrow.focused     = upArrow.shape.contains(new Point(e.getX(), e.getY()));
                 downArrow.focused   = downArrow.shape.contains(new Point(e.getX(), e.getY()));
+
+                smallCircle.focused   = smallCircle.shape.contains(new Point(e.getX(), e.getY()));
+                mediumCircle.focused  = mediumCircle.shape.contains(new Point(e.getX(), e.getY()));
+                largeCircle.focused   = largeCircle.shape.contains(new Point(e.getX(), e.getY()));
             }
         });
+
+        setSelectedSize();
+    }
+
+    private void setSelectedSize() {
+        smallCircle.selected  = false;
+        mediumCircle.selected = false;
+        largeCircle.selected  = false;
+
+        switch (PopupSize.valueOf(appConfig.getPopUpSize())) {
+            case SMALL    -> smallCircle.selected  = true;
+            case MEDIUM   -> mediumCircle.selected = true;
+            case LARGE    -> largeCircle.selected  = true;
+        }
     }
 
     @Override
@@ -124,39 +168,46 @@ public class PopupPositionSelector extends JComponent {
             buffer.fillRect(0, 0, COMPONENT_WIDTH, COMPONENT_HEIGHT);
 
             buffer.setColor(Color.WHITE);
-
             Arrays.stream(selectablePositionRects).forEach(selectableRect -> {
                 if (selectableRect.selected) {
-                    buffer.setColor(selectedColor);
-                    buffer.fill(selectableRect.shape);
-
+                    paintWhenComponentSelected(selectableRect);
                     buffer.setColor(Color.BLACK);
                     buffer.setFont(defaultFont);
                     buffer.drawString("A", selectableRect.shape.getBounds().x + 10, selectableRect.shape.getBounds().y + 28);
                 } else {
-                    if (selectableRect.focused) {
-                        buffer.setColor(focusColor);
-                        buffer.fill(selectableRect.shape);
-                    }
-
-                    buffer.setColor(Color.WHITE);
-                    buffer.draw(selectableRect.shape);
+                    paintWhenComponentFocused(selectableRect);
                 }
             });
+
+            paintWhenComponentFocused(smallCircle);
+            paintWhenComponentFocused(mediumCircle);
+            paintWhenComponentFocused(largeCircle);
+            paintWhenComponentSelected(smallCircle);
+            paintWhenComponentSelected(mediumCircle);
+            paintWhenComponentSelected(largeCircle);
 
             paintWhenComponentFocused(upArrow);
             paintWhenComponentFocused(downArrow);
 
             buffer.setColor(selectedColor);
-            buffer.setFont(propertyFont);
+            buffer.setFont(popupDelayFont);
             float popupDelay = Float.parseFloat(appConfig.getPopUpDelay());
-            buffer.drawString(Helpers.formatWithOneDecimalPlace(popupDelay) +"s", 60, 150);
+            buffer.drawString(Helpers.formatWithOneDecimalPlace(popupDelay) +"s", 60, 160);
         }
     }
 
     private void paintWhenComponentFocused(UIComponent component) {
         if(component.focused) {
-            buffer.setColor(Color.GRAY);
+            buffer.setColor(focusColor);
+            buffer.fill(component.shape);
+        }
+        buffer.setColor(Color.WHITE);
+        buffer.draw(component.shape);
+    }
+
+    private void paintWhenComponentSelected(UIComponent component) {
+        if(component.selected) {
+            buffer.setColor(selectedColor);
             buffer.fill(component.shape);
         }
         buffer.setColor(Color.WHITE);

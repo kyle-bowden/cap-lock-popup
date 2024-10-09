@@ -1,6 +1,7 @@
 package co.uk.bittwisted;
 
 import co.uk.bittwisted.config.AppConfig;
+import co.uk.bittwisted.enums.PopupSize;
 import co.uk.bittwisted.enums.Position;
 import co.uk.bittwisted.util.Helpers;
 import co.uk.bittwisted.views.InfoView;
@@ -24,30 +25,40 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static java.lang.Thread.sleep;
-import static javax.swing.SwingUtilities.*;
+import static javax.swing.SwingUtilities.invokeLater;
 
 public class CapsLockHook extends JFrame implements NativeKeyListener {
     private Timer timer;
     private final Robot robot;
-    private final Font defaultFont = new Font("Arial Black", Font.PLAIN, 50);
     private final Logger logger = Logger.getLogger(CapsLockHook.class.getName());
     private final SettingsView settingsView;
     private boolean capsLockOn;
     private boolean isSuccessPopup;
     private boolean RESET_IN_ACTION = false;
 
-    private final Point topLeft;
-    private final Point topRight;
-    private final Point topCenter;
-    private final Point bottomLeft;
-    private final Point bottomRight;
-    private final Point bottomCenter;
-
     private final AppConfig appConfig;
-    private final String appDataFolderPath = System.getenv("APPDATA") + "\\cap-lock-hook";
+    private final String appDataFolderPath = System.getenv("APPDATA") + "\\cap-up";
+
+    private final Rectangle maximinWindowBounds;
 
     private final Color borderColor = new Color(187, 187, 187);
     private final GradientPaint defaultBackgroundGradient;
+
+    private final Font smallFont = new Font("Arial Black", Font.PLAIN, 30);
+    private final int APP_WIDTH_SMALL  = 75;
+    private final int APP_HEIGHT_SMALL = 75;
+
+    private final Font mediumFont = new Font("Arial Black", Font.PLAIN, 50);
+    private final int APP_WIDTH_MEDIUM  = 100;
+    private final int APP_HEIGHT_MEDIUM = 100;
+
+    private final Font largeFont = new Font("Arial Black", Font.PLAIN, 70);
+    private final int APP_WIDTH_LARGE  = 125;
+    private final int APP_HEIGHT_LARGE = 125;
+
+    private Font sizeFont     = mediumFont;
+    private int APP_WIDTH     = APP_WIDTH_MEDIUM;
+    private int APP_HEIGHT    = APP_HEIGHT_MEDIUM;
 
     public CapsLockHook() throws AWTException {
         appConfig = new AppConfig(appDataFolderPath);
@@ -55,11 +66,11 @@ public class CapsLockHook extends JFrame implements NativeKeyListener {
         setTitle(appConfig.getAppName());
         setType(Type.UTILITY);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(100, 100);
         setLocationRelativeTo(null);
         setUndecorated(true);
         setAlwaysOnTop(true);
         setFocusableWindowState(false);
+        setSize(APP_WIDTH, APP_HEIGHT);
         setShape(new RoundRectangle2D.Double(0, 0, getWidth(), getHeight(), 30, 30));
 
         // Get the logger for "org.jnativehook" and set the level to off.
@@ -76,14 +87,7 @@ public class CapsLockHook extends JFrame implements NativeKeyListener {
                 new Color(78, 80, 82));
 
         GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-        Rectangle bounds = ge.getMaximumWindowBounds();
-        topLeft = new Point(bounds.x + 10, bounds.y + 10);
-        topRight = new Point(bounds.x + bounds.width - getSize().width - 10, bounds.y + 10);
-        topCenter = new Point(bounds.x + (bounds.width/2) - getSize().width/2, bounds.y + 10);
-        bottomLeft = new Point(bounds.x + 10, bounds.y + bounds.height - getSize().height - 10);
-        bottomRight = new Point(bounds.x + bounds.width - getSize().width - 10, bounds.y + bounds.height - getSize().height - 10);
-        bottomCenter = new Point(bounds.x + (bounds.width/2) - getSize().width/2, bounds.y + bounds.height - getSize().height - 10);
-        setLocation(bottomRight);
+        maximinWindowBounds = ge.getMaximumWindowBounds();
 
         startCapsLockHook();
 
@@ -102,7 +106,8 @@ public class CapsLockHook extends JFrame implements NativeKeyListener {
             infoView.showInfo();
         }
 
-        updatePopupPosition(Position.valueOf(appConfig.getLocation()));
+        setPopUpSize(PopupSize.valueOf(appConfig.getPopUpSize()));
+        setPopupPosition(Position.valueOf(appConfig.getPosition()));
     }
 
     private void setupSystemTray() {
@@ -174,10 +179,10 @@ public class CapsLockHook extends JFrame implements NativeKeyListener {
 
         g2d.setRenderingHint(
                 RenderingHints.KEY_TEXT_ANTIALIASING,
-                RenderingHints.VALUE_TEXT_ANTIALIAS_GASP);
+                RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
         g2d.setPaint(defaultBackgroundGradient);
-        g2d.fillRect(0, 0, 100, 100);
+        g2d.fillRect(0, 0, APP_WIDTH, APP_HEIGHT);
 
         if(!isSuccessPopup) {
             if(RESET_IN_ACTION) {
@@ -185,8 +190,15 @@ public class CapsLockHook extends JFrame implements NativeKeyListener {
             } else {
                 g2d.setColor(borderColor);
             }
-            g2d.setFont(defaultFont);
-            g2d.drawString(message, 32, 65);
+            g2d.setFont(sizeFont);
+
+            FontMetrics fm = g2d.getFontMetrics();
+            int stringWidth = fm.stringWidth(message);
+            int stringHeight = fm.getAscent() + fm.getDescent();
+            int textX = (getWidth() - stringWidth) / 2;
+            int textY = (getHeight() - stringHeight) / 2 + fm.getAscent();
+            g2d.setColor(Color.WHITE);
+            g2d.drawString(message, textX, textY);
         } else {
             // Define the path of the check mark
             Path2D check = new Path2D.Double();
@@ -242,8 +254,44 @@ public class CapsLockHook extends JFrame implements NativeKeyListener {
         }
     }
 
-    public void updatePopupPosition(Position position) {
+    public void setPopUpSize(PopupSize popupSize) {
+        logger.log(Level.INFO, "POPUP SIZE:" + popupSize);
+        switch (popupSize) {
+            case SMALL -> {
+                sizeFont   = smallFont;
+                APP_WIDTH  = APP_WIDTH_SMALL;
+                APP_HEIGHT = APP_HEIGHT_SMALL;
+            }
+            case MEDIUM -> {
+                sizeFont   = mediumFont;
+                APP_WIDTH  = APP_WIDTH_MEDIUM;
+                APP_HEIGHT = APP_HEIGHT_MEDIUM;
+            }
+            case LARGE -> {
+                sizeFont   = largeFont;
+                APP_WIDTH  = APP_WIDTH_LARGE;
+                APP_HEIGHT = APP_HEIGHT_LARGE;
+            }
+        }
+
+        setSize(APP_WIDTH, APP_HEIGHT);
+        setShape(new RoundRectangle2D.Double(0, 0, APP_WIDTH, APP_HEIGHT, 30, 30));
+        if(PopupSize.valueOf(appConfig.getPopUpSize()) != popupSize) {
+            appConfig.updatePopUpSize(popupSize);
+            setVisible(false);
+            showCapsLockStatusPopup();
+        }
+    }
+
+    public void setPopupPosition(Position position) {
         logger.log(Level.INFO, "POSITION:" + position);
+
+        Point topLeft = new Point(maximinWindowBounds.x + 10, maximinWindowBounds.y + 10);
+        Point topRight = new Point(maximinWindowBounds.x + maximinWindowBounds.width - getSize().width - 10, maximinWindowBounds.y + 10);
+        Point topCenter = new Point(maximinWindowBounds.x + (maximinWindowBounds.width / 2) - getSize().width / 2, maximinWindowBounds.y + 10);
+        Point bottomLeft = new Point(maximinWindowBounds.x + 10, maximinWindowBounds.y + maximinWindowBounds.height - getSize().height - 10);
+        Point bottomRight = new Point(maximinWindowBounds.x + maximinWindowBounds.width - getSize().width - 10, maximinWindowBounds.y + maximinWindowBounds.height - getSize().height - 10);
+        Point bottomCenter = new Point(maximinWindowBounds.x + (maximinWindowBounds.width / 2) - getSize().width / 2, maximinWindowBounds.y + maximinWindowBounds.height - getSize().height - 10);
         switch (position) {
             case TOP_LEFT: setLocation(topLeft); break;
             case TOP_RIGHT: setLocation(topRight); break;
@@ -252,11 +300,14 @@ public class CapsLockHook extends JFrame implements NativeKeyListener {
             case BOTTOM_RIGHT: setLocation(bottomRight); break;
             case BOTTOM_CENTER: setLocation(bottomCenter); break;
         }
-        appConfig.updateLocation(position);
-        showCapsLockStatusPopup();
+
+        if(Position.valueOf(appConfig.getPosition()) != position) {
+            appConfig.updatePosition(position);
+            showCapsLockStatusPopup();
+        }
     }
 
-    public void updatePopupDelay(boolean isUp) {
+    public void setPopupDelay(boolean isUp) {
         float popupDelay = Float.parseFloat(appConfig.getPopUpDelay());
         if(isUp) {
             if(popupDelay < 5f) {
@@ -279,7 +330,6 @@ public class CapsLockHook extends JFrame implements NativeKeyListener {
     public void showCapsLockStatusPopup() {
         isSuccessPopup = false;
         if (isVisible()) {
-            logger.log(Level.SEVERE, "RESTART");
             timer.restart();
         } else {
             setVisible(true);
@@ -348,14 +398,20 @@ public class CapsLockHook extends JFrame implements NativeKeyListener {
     }
 
     private void maybeRectifyFalseCapLockState(NativeKeyEvent e) {
-        boolean checkCapsLockOn = Character.isUpperCase(e.getKeyChar());
+        char keyChar = e.getKeyChar();
+        // Backspace causes a bug, so we need to check for whitespace or ISO control characters
+        // to prevent the rectify logic from executing below
+        if(Character.isWhitespace(keyChar) || Character.isISOControl(keyChar)) return;
+
+        boolean checkCapsLockOn = Character.isUpperCase(keyChar);
         if(e.getModifiers() != NativeInputEvent.SHIFT_L_MASK && checkCapsLockOn != capsLockOn) {
+            // bug
             capsLockOn = checkCapsLockOn;
             logger.info("Rectify caps lock state: " + checkCapsLockOn);
         } else
         if (e.getModifiers() == NativeInputEvent.SHIFT_L_MASK && checkCapsLockOn == capsLockOn) {
             capsLockOn = !checkCapsLockOn;
-            logger.info("Rectify caps lock state: " + checkCapsLockOn);
+            logger.info("Rectify caps lock state when shift is held: " + checkCapsLockOn);
         }
     }
 
@@ -372,12 +428,6 @@ public class CapsLockHook extends JFrame implements NativeKeyListener {
     }
 
     public void nativeKeyPressed(NativeKeyEvent e) {
-        if (e.getKeyCode() == NativeKeyEvent.VC_CAPS_LOCK) {
-            RESET_IN_ACTION = false;
-            capsLockOn = !capsLockOn;
-            showCapsLockStatusPopup();
-        }
-
         if(appConfig.getQuickFixEnabled() &&
             e.getModifiers() == NativeInputEvent.CTRL_L_MASK &&
                 e.getKeyCode() == NativeKeyEvent.VC_Q) {
@@ -385,7 +435,13 @@ public class CapsLockHook extends JFrame implements NativeKeyListener {
         }
     }
 
-    public void nativeKeyReleased(NativeKeyEvent e) {}
+    public void nativeKeyReleased(NativeKeyEvent e) {
+        if (e.getKeyCode() == NativeKeyEvent.VC_CAPS_LOCK) {
+            RESET_IN_ACTION = false;
+            capsLockOn = !capsLockOn;
+            showCapsLockStatusPopup();
+        }
+    }
 
     public void nativeKeyTyped(NativeKeyEvent e) {
         maybeRectifyFalseCapLockState(e);
