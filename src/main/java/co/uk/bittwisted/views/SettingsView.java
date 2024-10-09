@@ -5,6 +5,7 @@ import co.uk.bittwisted.config.AppConfig;
 import co.uk.bittwisted.views.components.PopupPositionSelector;
 
 import javax.swing.*;
+import javax.swing.border.BevelBorder;
 import java.awt.*;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -14,17 +15,18 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class SettingsView extends JFrame {
+public class SettingsView extends JDialog {
     private final AppConfig appConfig;
     private InfoView infoView;
 
     private final Logger logger = Logger.getLogger(SettingsView.class.getName());
 
-    private final int WINDOW_WIDTH = 525;
-    private final int WINDOW_HEIGHT = 288;
+    private final int WINDOW_WIDTH = 540;
+    private final int WINDOW_HEIGHT = 320;
 
     public final Font defaultFont = new Font("Arial", Font.PLAIN, 18);
     public final Font infoFont = new Font("Arial", Font.ITALIC, 14);
+    public final Font labelFont = new Font("Arial", Font.BOLD, 12);
 
     public SettingsView(CapsLockHook clh, AppConfig config) {
         this.appConfig = config;
@@ -38,11 +40,39 @@ public class SettingsView extends JFrame {
         setLocationRelativeTo(null);
         setDefaultLookAndFeelDecorated(true);
 
-        setLayout(new GridLayout(1, 2));
+        setLayout(new GridBagLayout());
 
+        GridBagConstraints c = new GridBagConstraints();
+        c.fill = GridBagConstraints.BOTH;
+
+        c.gridx = 0;
+        c.gridy = 0;
+        c.weightx = 1.0;
+        c.weighty = 0.10;
+        JPanel popupSettingInfoPanel = new JPanel();
+        popupSettingInfoPanel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
+
+        JLabel popupInfoLabel = new JLabel("Position, size and delay");
+        popupInfoLabel.setFont(labelFont);
+        popupSettingInfoPanel.add(popupInfoLabel);
+        add(popupSettingInfoPanel, c);
+
+        c.gridx = 1;
+        JPanel appSettingInfoPanel = new JPanel();
+        appSettingInfoPanel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
+
+        JLabel appInfoLabel = new JLabel("Application settings");
+        appInfoLabel.setFont(labelFont);
+        appSettingInfoPanel.add(appInfoLabel);
+        add(appSettingInfoPanel, c);
+
+        c.gridx = 0;
+        c.gridy = 1;
+        c.weighty = 0.90;
         PopupPositionSelector popupPositionSelector = new PopupPositionSelector(clh, appConfig);
-        add(popupPositionSelector);
+        add(popupPositionSelector, c);
 
+        c.gridx = 1;
         JPanel panel = new JPanel();
         panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 0));
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
@@ -133,7 +163,7 @@ public class SettingsView extends JFrame {
 
         panel.add(infoButton);
 
-        add(panel);
+        add(panel, c);
 
         boolean shouldMinimiseOnStartOnlyIfNotFirstTimeUser =
                 !appConfig.getMinimiseOnStartEnabled() && !appConfig.isFirstTimeUser();

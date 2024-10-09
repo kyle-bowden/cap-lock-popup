@@ -14,7 +14,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class InfoView extends JDialog {
-    private final int WINDOW_WIDTH = 525;
+    private final int WINDOW_WIDTH = 540;
     private final int WINDOW_HEIGHT = 400;
 
     private final Logger logger = Logger.getLogger(InfoView.class.getName());
@@ -27,7 +27,7 @@ public class InfoView extends JDialog {
     private static final String developerLink = "https://github.com/kyle-bowden/cap-lock-popup";
 
     public InfoView(SettingsView settingsView, AppConfig appConfig) {
-        super(settingsView, "Info", true);
+        super(settingsView, "Info", false);
 
         setResizable(false);
         setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
