@@ -22,7 +22,7 @@ public class AppConfig {
 
     public static final String PROPERTY_LOCATION                    = "location";
     public static final String PROPERTY_CLIENT_ID                   = "clientId";
-    public static final String PROPERTY_POPUP_SIZE                  = "medium";
+    public static final String PROPERTY_POPUP_SIZE                  = "popupSize";
     public static final String PROPERTY_POPUP_DELAY                 = "popupDelay";
     public static final String PROPERTY_QUICK_FIX_ENABLED           = "quickFixEnabled";
     public static final String PROPERTY_AUTO_STARTUP_ENABLED        = "autoStartupEnabled";
@@ -35,6 +35,7 @@ public class AppConfig {
     public static String DEFAULT_POPUP_DELAY                = Helpers.formatWithOneDecimalPlace(2f);
     public static Boolean DEFAULT_AUTO_STARTUP_ENABLED      = Boolean.TRUE;
     public static Boolean DEFAULT_MINIMISE_ON_START_ENABLED = Boolean.TRUE;
+    public static PopupSize DEFAULT_POPUP_SIZE              = PopupSize.MEDIUM;
 
     public AppConfig(String appDataFolderPath) {
         this.versionReader = new VersionReader();
@@ -56,7 +57,7 @@ public class AppConfig {
         if(!configFile.exists()) {
             updateClientId(UUID.randomUUID().toString());
             updateLocation(DEFAULT_POSITION);
-            updatePopUpSize(PopupSize.MEDIUM);
+            updatePopUpSize(DEFAULT_POPUP_SIZE);
             updatePopUpDelay(DEFAULT_POPUP_DELAY);
             updateQuickFixEnabled(DEFAULT_QUICK_FIX_ENABLED);
             updateAutoStartupEnabled(DEFAULT_AUTO_STARTUP_ENABLED);
