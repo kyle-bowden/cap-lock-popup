@@ -1,7 +1,7 @@
 # CapUp
 
-A Windows application that provides an on-screen popup to display the current s
-tate of the Caps Lock key.
+A Windows application that provides an on-screen popup to display the current 
+state of the Caps Lock key.
 
 ## Application Information
 
