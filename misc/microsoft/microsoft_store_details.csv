@@ -22,7 +22,7 @@ ProductFeatures17,Text,
 ProductFeatures18,Text,
 ProductFeatures19,Text,
 ProductFeatures20,Text,
-ShortDescription,Text,A simple Windows GUI application to display what state the cap lock key is in.
+ShortDescription,Text,A Windows application that provides an on-screen popup to display the current state of the Caps Lock key.
 SearchTerms1,Text,cap lock
 SearchTerms2,Text,
 SearchTerms3,Text,
