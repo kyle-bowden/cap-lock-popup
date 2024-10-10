@@ -10,7 +10,7 @@ on-screen popup displaying its current state. The popup will show either an uppe
 
 ![1_popup_cap_key_state.png](misc%2Fmicrosoft%2Fscreenshots%2F1_popup_cap_key_state.png)
 
-The location, size and delay of the popup can be configured via the settings view as seen below
+You can configure the location, size, and delay of the popup, along with other general application settings, through the settings view shown below.
 
 ![2_popup_settings.png](misc%2Fmicrosoft%2Fscreenshots%2F2_popup_settings.png)
 
