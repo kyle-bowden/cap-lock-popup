@@ -1,19 +1,22 @@
 # CapUp
 
-A simple Windows GUI application to display what state the cap lock key is in.
+A Windows application that provides an on-screen popup to display the current s
+tate of the Caps Lock key.
 
-## Install
+## Application Information
 
-### Windows
+Once CapUp is installed, pressing the Caps Lock key will trigger an 
+on-screen popup displaying its current state. The popup will show either an uppercase "A" or a lowercase "a", indicating whether Caps Lock is on or off, as shown below.
 
-Ensure you have Wix setup on your machine as jpackage is used, but it overrides custom options.
+![1_popup_cap_key_state.png](misc%2Fmicrosoft%2Fscreenshots%2F1_popup_cap_key_state.png)
 
-Then run maven package 
-```
-mvn clean package jpackage:jpackage
-```
+You can configure the location, size, and delay of the popup, along with other general application settings, through the settings view shown below.
 
-## Metrics
+![2_popup_settings.png](misc%2Fmicrosoft%2Fscreenshots%2F2_popup_settings.png)
 
-Metrics are captured for this app, like keypress events and mouseclick
-you can view metrics [here](https://analytics.google.com/analytics/web/#/realtime/rt-event/a98191047w355838565p285581166/)
+If you'd like additional functionality added in the future, please create a new 
+feature request in the GitHub issues section. Be sure to tag the issue with the "enhancement" label.
+
+Please also report any bugs via the issues tab too.
+
+## Enjoy!

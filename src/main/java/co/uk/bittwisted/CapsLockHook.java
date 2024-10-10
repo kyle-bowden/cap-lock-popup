@@ -18,6 +18,8 @@ import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.geom.Path2D;
 import java.awt.geom.RoundRectangle2D;
 import java.util.Objects;
@@ -139,6 +141,15 @@ public class CapsLockHook extends JFrame implements NativeKeyListener {
             popupMenu.add(exitItem);
 
             TrayIcon trayIcon = new TrayIcon(image, appConfig.getAppName(), popupMenu);
+
+            trayIcon.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    if (e.getButton() == MouseEvent.BUTTON1) {
+                        settingsView.showSettings();
+                    }
+                }
+            });
 
             try {
                 tray.add(trayIcon);
