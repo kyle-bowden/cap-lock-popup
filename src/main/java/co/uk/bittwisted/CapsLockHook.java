@@ -410,19 +410,18 @@ public class CapsLockHook extends JFrame implements NativeKeyListener {
 
     private void maybeRectifyFalseCapLockState(NativeKeyEvent e) {
         char keyChar = e.getKeyChar();
-        // Backspace causes a bug, so we need to check for whitespace or ISO control characters
-        // to prevent the rectify logic from executing below
-        if(Character.isWhitespace(keyChar) || Character.isISOControl(keyChar)) return;
+        if(Character.isLetterOrDigit(keyChar))  {
+            logger.warning("PASSED maybeRectifyFalseCapLockState!!! [" + keyChar + "]");
 
-        boolean checkCapsLockOn = Character.isUpperCase(keyChar);
-        if(e.getModifiers() != NativeInputEvent.SHIFT_L_MASK && checkCapsLockOn != capsLockOn) {
-            // bug
-            capsLockOn = checkCapsLockOn;
-            logger.info("Rectify caps lock state: " + checkCapsLockOn);
-        } else
-        if (e.getModifiers() == NativeInputEvent.SHIFT_L_MASK && checkCapsLockOn == capsLockOn) {
-            capsLockOn = !checkCapsLockOn;
-            logger.info("Rectify caps lock state when shift is held: " + checkCapsLockOn);
+            boolean checkCapsLockOn = Character.isUpperCase(keyChar);
+            if (e.getModifiers() == NativeInputEvent.SHIFT_L_MASK && checkCapsLockOn == capsLockOn) {
+                capsLockOn = !checkCapsLockOn;
+                logger.info("Rectify caps lock state when shift is held: " + checkCapsLockOn);
+            } else
+            if(e.getModifiers() != NativeInputEvent.SHIFT_L_MASK && checkCapsLockOn != capsLockOn) {
+                capsLockOn = checkCapsLockOn;
+                logger.info("Rectify caps lock state: " + checkCapsLockOn);
+            }
         }
     }
 
