@@ -25,7 +25,9 @@ Please also report any bugs via the issues tab too.
 
 <div style="text-align: center;">
   <h1>Download for Windows</h1>
-  <a href="https://kyle-bowden.github.io/cap-lock-popup/downloads/v1.4.2/CapUp-1.4.2.msi"><h2>v1.4.2(Latest)</h2></a>
+  <a style="font-size: 32px; font-weight: bold;" href="https://kyle-bowden.github.io/cap-lock-popup/downloads/v1.4.2/CapUp-1.4.2.msi">
+    v1.4.2(Latest)
+  </a>
   <h2>Enjoy!</h2>
 </div>
 
