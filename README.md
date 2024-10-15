@@ -8,17 +8,27 @@ state of the Caps Lock key.
 Once CapUp is installed, pressing the Caps Lock key will trigger an 
 on-screen popup displaying its current state. The popup will show either an uppercase "A" or a lowercase "a", indicating whether Caps Lock is on or off, as shown below.
 
-![1_popup_cap_key_state.png](misc%2Fmicrosoft%2Fscreenshots%2F1_popup_cap_key_state.png)
+<p style="text-align: center;">
+  <img src="misc%2Fmicrosoft%2Fscreenshots%2F1_popup_cap_key_state.png" alt="Screenshot 1">
+</p>
 
 You can configure the location, size, and delay of the popup, along with other general application settings, through the settings view shown below.
 
-![2_popup_settings.png](misc%2Fmicrosoft%2Fscreenshots%2F2_popup_settings.png)
+<p style="text-align: center;">
+  <img src="misc%2Fmicrosoft%2Fscreenshots%2F2_popup_settings.png" alt="Screenshot 2">
+</p>
 
 If you'd like additional functionality added in the future, please create a new 
 feature request in the GitHub issues section. Be sure to tag the issue with the "enhancement" label.
 
 Please also report any bugs via the issues tab too.
 
-[Download v1.4.2 for Windows](downloads%2Fv1.4.2%2FCapUp-1.4.2.msi)
+<div style="text-align: center;">
+  <h1>Download for Windows</h1>
+  <a href="https://kyle-bowden.github.io/cap-lock-popup/downloads/v1.4.2/CapUp-1.4.2.msi"><h2>v1.4.2(Latest)</h2></a>
+  <h2>Enjoy!</h2>
+</div>
 
-## Enjoy!
+---
+
+### [Privacy Policy](PRIVACY_POLICY.md)
