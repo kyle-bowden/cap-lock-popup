@@ -19,4 +19,6 @@ feature request in the GitHub issues section. Be sure to tag the issue with the 
 
 Please also report any bugs via the issues tab too.
 
+[Download v1.4.2 for Windows](downloads%2Fv1.4.2%2FCapUp-1.4.2.msi)
+
 ## Enjoy!
