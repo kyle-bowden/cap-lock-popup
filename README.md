@@ -28,9 +28,8 @@ Please also report any bugs via the issues tab too.
   <a style="font-size: 32px; font-weight: bold;" href="https://kyle-bowden.github.io/cap-lock-popup/downloads/v1.4.2/CapUp-1.4.2.msi">
     v1.4.2(Latest)
   </a>
-  <h2>Enjoy!</h2>
 </div>
 
----
-
-### [Privacy Policy](PRIVACY_POLICY.md)
+<a style="font-size: 17px; font-weight: bold;" href="https://kyle-bowden.github.io/cap-lock-popup/PRIVACY_POLICY.html">
+    Privacy Policy
+</a>
