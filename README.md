@@ -30,6 +30,8 @@ Please also report any bugs via the issues tab too.
     </a>
 </div>
 
+***
+
 <div>
     <a style="font-size: 17px; font-weight: bold;" href="https://kyle-bowden.github.io/cap-lock-popup/PRIVACY_POLICY.html">
         Privacy Policy
